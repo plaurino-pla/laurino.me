@@ -211,6 +211,19 @@ body {
   opacity: 0;
 }
 
+/* reflow the hint by device: keyboard hints on desktop, touch hints on phones */
+.hint .touch {
+  display: none;
+}
+@media (pointer: coarse) {
+  .hint .kb {
+    display: none;
+  }
+  .hint .touch {
+    display: inline;
+  }
+}
+
 .sig {
   position: fixed;
   right: 16px;

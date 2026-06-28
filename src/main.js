@@ -850,7 +850,8 @@ function addLamps() {
     spots.push([Math.cos(a) * 84, Math.sin(a) * 84]);
   }
   for (let k = 0; k < 12; k++) {
-    const a = (k / 12) * Math.PI * 2;
+    // half-step phase so no lamp lands dead-centre on the spawn sightline
+    const a = (k / 12) * Math.PI * 2 + Math.PI / 12;
     spots.push([Math.cos(a) * 31, Math.sin(a) * 31]);
   }
   const poles = new THREE.InstancedMesh(poleGeo, poleMat, spots.length);
