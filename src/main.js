@@ -572,31 +572,39 @@ function addMuseum() {
 function addAmphitheatre() {
   const g = new THREE.Group();
   const concrete = new THREE.MeshStandardMaterial({ color: C.stoneShade, roughness: 1, flatShading: true });
-  // curved seating tiers (half rings)
-  for (let i = 0; i < 7; i++) {
-    const rin = 8 + i * 2.2;
-    const tier = new THREE.Mesh(
-      new THREE.RingGeometry(rin, rin + 2.1, 28, 1, Math.PI * 0.15, Math.PI * 0.7),
-      concrete
-    );
-    tier.rotation.x = -Math.PI / 2;
-    tier.position.y = 0.3 + i * 0.9;
-    tier.receiveShadow = true;
-    // raise each tier with a riser block ring approximated by stacking
-    g.add(tier);
+  // stepped seating bank — a lathed stepped profile over a partial arc
+  const prof = [];
+  let pr = 7;
+  let py = 0;
+  for (let i = 0; i < 9; i++) {
+    prof.push(new THREE.Vector2(pr, py)); // tread inner
+    pr += 2.0;
+    prof.push(new THREE.Vector2(pr, py)); // tread outer
+    py += 0.8;
+    prof.push(new THREE.Vector2(pr, py)); // riser up
   }
+  const bowl = new THREE.Mesh(
+    new THREE.LatheGeometry(prof, 40, Math.PI * 0.12, Math.PI * 0.76),
+    concrete
+  );
+  bowl.castShadow = bowl.receiveShadow = true;
+  g.add(bowl);
   // stage
   const stage = new THREE.Mesh(
     new THREE.CylinderGeometry(7, 7, 1, 28, 1, false, Math.PI * 0.1, Math.PI * 0.8),
     new THREE.MeshStandardMaterial({ color: 0x6a5440, roughness: 0.9 })
   );
   stage.position.y = 0.5;
+  stage.receiveShadow = true;
   g.add(stage);
   // back wall
   const back = new THREE.Mesh(new THREE.BoxGeometry(18, 7, 1), concrete);
   back.position.set(0, 3.5, -7);
   back.castShadow = true;
   g.add(back);
+  const anfiSign = makePlaque('anfiteatro', 1.3, { bg: '#3c4a33', fg: '#ece6d2', family: 'ui-monospace, monospace', weight: '600' });
+  anfiSign.position.set(0, 5.4, -6.4);
+  g.add(anfiSign);
   // lighting truss
   const trussMat = new THREE.MeshStandardMaterial({ color: C.iron, roughness: 0.7, metalness: 0.4 });
   [-7, 7].forEach((sx) => {
@@ -656,7 +664,21 @@ function addObservatory() {
     win.position.set(-3 + i * 2, 4.5, 5.05);
     g.add(win);
   }
+  // the historic refractor telescope, angled up through the slit
+  const scope = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.34, 0.42, 5.2, 12),
+    new THREE.MeshStandardMaterial({ color: 0xe9e6df, roughness: 0.4, metalness: 0.4 })
+  );
+  scope.position.set(0, 10.6, 0.4);
+  scope.rotation.set(0.7, 0, 0.15);
+  scope.castShadow = true;
+  g.add(scope);
+  // nameplate
+  const sign = makePlaque('observatorio', 1.1, { bg: '#26303a', fg: '#dfe6ec', family: 'ui-monospace, monospace', weight: '600' });
+  sign.position.set(0, 6.6, 5.06);
+  g.add(sign);
   g.position.set(-74, 0, 6);
+  g.rotation.y = Math.atan2(74, -6); // entrance/dome/scope face the park centre
   scene.add(g);
 }
 
@@ -713,9 +735,42 @@ function addCalesita() {
     spinner.add(horse, bar);
   }
   g.add(spinner);
+  // festive rim lights around the roof
+  const rimMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff0c0, emissiveIntensity: 1.2 });
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 6, 6), rimMat);
+    bulb.position.set(Math.cos(a) * 4.7, 5.1, Math.sin(a) * 4.7);
+    g.add(bulb);
+  }
+  // name banner — "calesita de Almendra" (for the niece), facing the park
+  const banner = new THREE.Group();
+  [-2.2, 2.2].forEach((sx) => {
+    const post = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.08, 0.08, 3.6, 6),
+      new THREE.MeshStandardMaterial({ color: 0x6a5a3a, roughness: 0.9 })
+    );
+    post.position.set(sx, 1.8, 0);
+    banner.add(post);
+  });
+  const board = makePlaque('calesita de Almendra', 0.62, {
+    bg: '#d24b3e',
+    fg: '#fff4e0',
+    weight: '700',
+    border: 'rgba(255,255,255,0.5)',
+  });
+  board.position.set(0, 3.5, 0);
+  banner.add(board);
+  const dirYaw = Math.atan2(-60, -30); // toward the park centre
+  banner.position.set(Math.sin(dirYaw) * 7, 0, Math.cos(dirYaw) * 7);
+  banner.rotation.y = dirYaw;
+  banner.traverse((m) => (m.castShadow = true));
+  g.add(banner);
+
   g.position.set(60, 0, 30);
   scene.add(g);
   calesitaSpinner = spinner;
+  addKite(66, 37);
 }
 let calesitaSpinner = null;
 
@@ -989,6 +1044,258 @@ function addCity() {
 }
 
 /* ----------------------------------------------------------------------------
+ * Text labels, people, signage + hidden family dedications (the easter eggs)
+ * ------------------------------------------------------------------------- */
+function makeLabelTexture(text, opts = {}) {
+  const {
+    fg = '#2b2620',
+    bg = '#c6a25e',
+    border = 'rgba(0,0,0,0.22)',
+    family = 'Georgia, "Times New Roman", serif',
+    weight = '600',
+  } = opts;
+  const fontPx = 62;
+  let cv = document.createElement('canvas');
+  let ctx = cv.getContext('2d');
+  ctx.font = `${weight} ${fontPx}px ${family}`;
+  const tw = ctx.measureText(text).width;
+  cv.width = Math.max(96, Math.ceil(tw + 92));
+  cv.height = 128;
+  ctx = cv.getContext('2d');
+  if (bg) {
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, cv.width, cv.height);
+  }
+  if (border) {
+    ctx.strokeStyle = border;
+    ctx.lineWidth = 5;
+    ctx.strokeRect(4, 4, cv.width - 8, cv.height - 8);
+  }
+  ctx.font = `${weight} ${fontPx}px ${family}`;
+  ctx.fillStyle = fg;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, cv.width / 2, cv.height / 2 + 3);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return { tex, aspect: cv.width / cv.height };
+}
+
+function makePlaque(text, height, opts = {}) {
+  const { tex, aspect } = makeLabelTexture(text, opts);
+  const mat = new THREE.MeshStandardMaterial({
+    map: tex,
+    roughness: 0.45,
+    metalness: opts.metalness ?? 0.35,
+    side: THREE.DoubleSide,
+  });
+  return new THREE.Mesh(new THREE.PlaneGeometry(height * aspect, height), mat);
+}
+
+const SKIN = [0xc89a6a, 0xe0b48a, 0x9c6f4a, 0xd6a87f];
+const HAIR = [0x2a2018, 0x4e3b2a, 0x141414, 0x6b5a3a, 0x8a8a8a];
+const SHIRT = [0x9c5b4a, 0x4a6f9e, 0x3f7d5a, 0xd9a23b, 0x7a5b9e, 0xcc6688, 0x556070, 0xb5483b];
+const pick = (a) => a[(Math.random() * a.length) | 0];
+
+function makePerson(opts = {}) {
+  const { s = 1, shirt = pick(SHIRT), pants = 0x39424f, skin = pick(SKIN), hair = pick(HAIR) } = opts;
+  const g = new THREE.Group();
+  const M = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.95, flatShading: true });
+  const legs = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.9, 0.3), M(pants));
+  legs.position.y = 0.45;
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.72, 0.32), M(shirt));
+  torso.position.y = 1.22;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 10, 8), M(skin));
+  head.position.y = 1.78;
+  const cap = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), M(hair));
+  cap.position.y = 1.82;
+  [-1, 1].forEach((sx) => {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.66, 0.15), M(shirt));
+    arm.position.set(sx * 0.33, 1.2, 0);
+    g.add(arm);
+  });
+  g.add(legs, torso, head, cap);
+  g.scale.setScalar(s);
+  g.traverse((m) => (m.castShadow = true));
+  return g;
+}
+
+function makeSeatedPerson(opts = {}) {
+  const { s = 1, shirt = pick(SHIRT), pants = 0x39424f, skin = pick(SKIN), hair = pick(HAIR) } = opts;
+  const g = new THREE.Group();
+  const M = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.95, flatShading: true });
+  const Y = 0.55;
+  const thighs = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.2, 0.6), M(pants));
+  thighs.position.set(0, Y + 0.12, 0.2);
+  const shins = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.55, 0.2), M(pants));
+  shins.position.set(0, 0.3, 0.48);
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.6, 0.3), M(shirt));
+  torso.position.set(0, Y + 0.5, -0.06);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), M(skin));
+  head.position.set(0, Y + 0.95, -0.06);
+  const cap = new THREE.Mesh(new THREE.SphereGeometry(0.19, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), M(hair));
+  cap.position.set(0, Y + 0.99, -0.06);
+  g.add(thighs, shins, torso, head, cap);
+  g.scale.setScalar(s);
+  g.traverse((m) => (m.castShadow = true));
+  return g;
+}
+
+const peopleWalkers = [];
+function addPeople() {
+  const place = (p, x, z, yaw = Math.random() * Math.PI * 2) => {
+    p.position.set(x, 0, z);
+    p.rotation.y = yaw;
+    scene.add(p);
+  };
+  // strollers walking the lake loop (animated)
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2;
+    const p = makePerson();
+    p.position.set(Math.cos(a) * 31, 0, Math.sin(a) * 31);
+    scene.add(p);
+    peopleWalkers.push({ g: p, R: 31, a, spd: (i % 2 ? 1 : -1) * (0.12 + Math.random() * 0.06) });
+  }
+  // a few standing near the feria / museum / promenade
+  place(makePerson(), -9, 36, -1.6);
+  place(makePerson(), 9, 41, 1.6);
+  place(makePerson(), 4, 50, Math.PI);
+  place(makePerson(), -3, -16, 0); // by the lake, looking at the statue
+  place(makePerson(), 5, -52, 0.4); // near the museum steps
+  // seated folks on the lakeside benches (matches addBenches ring r34)
+  [0, 4, 7].forEach((k) => {
+    const a = (k / 10) * Math.PI * 2;
+    place(makeSeatedPerson(), Math.cos(a) * 34, Math.sin(a) * 34, -a + Math.PI / 2);
+  });
+  // kids near the calesita
+  place(makePerson({ s: 0.72 }), 54, 33, -1);
+  place(makePerson({ s: 0.66 }), 57, 26, 2);
+}
+
+// the family easter eggs: five lakeside dedication benches with name plaques
+function addDedicationBench(name, angle, radius = 39) {
+  const g = new THREE.Group();
+  const slat = new THREE.MeshStandardMaterial({ color: 0x3c5e3a, roughness: 0.9 });
+  const iron = new THREE.MeshStandardMaterial({ color: C.iron, roughness: 0.6 });
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.12, 0.6), slat);
+  seat.position.y = 0.55;
+  const back = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.5, 0.1), slat);
+  back.position.set(0, 0.86, -0.28);
+  g.add(seat, back);
+  [-1, 1].forEach((sx) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.55, 0.6), iron);
+    leg.position.set(sx * 1, 0.27, 0);
+    g.add(leg);
+  });
+  // brass dedication plaque on the backrest, facing the lakeside path
+  const plaque = makePlaque(name, 0.18, { bg: '#b8893b', fg: '#23201a', metalness: 0.55, border: 'rgba(0,0,0,0.3)' });
+  plaque.position.set(0, 0.95, -0.2);
+  g.add(plaque);
+  g.traverse((m) => (m.castShadow = true));
+  const x = Math.cos(angle) * radius;
+  const z = Math.sin(angle) * radius;
+  g.position.set(x, 0, z);
+  g.rotation.y = Math.atan2(-x, -z); // seat (and plaque) face the lake / the loop path
+  scene.add(g);
+}
+
+function addDedications() {
+  const D = Math.PI / 180;
+  addDedicationBench('Daniel Laurino', 200 * D);
+  addDedicationBench('Beatriz Rosa Assenza Parisi', 250 * D);
+  addDedicationBench('Pachi Laurino', 320 * D);
+  addDedicationBench('Andrés Laurino', 25 * D);
+  addDedicationBench('María Paula Laurino', 135 * D);
+}
+
+function addSignpost(x, z, yaw, lines, opts = {}) {
+  const g = new THREE.Group();
+  const post = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.1, 0.13, 3.4, 8),
+    new THREE.MeshStandardMaterial({ color: 0x5b4a36, roughness: 0.9 })
+  );
+  post.position.y = 1.7;
+  post.castShadow = true;
+  g.add(post);
+  lines.forEach((t, i) => {
+    const b = makePlaque(t, opts.size || 0.36, {
+      bg: '#3c4a33',
+      fg: '#ece6d2',
+      family: 'ui-monospace, "SF Mono", Menlo, monospace',
+      weight: '600',
+      border: 'rgba(255,255,255,0.16)',
+      metalness: 0.1,
+    });
+    b.position.set(0, 2.85 - i * 0.52, 0.08);
+    b.castShadow = true;
+    g.add(b);
+  });
+  g.position.set(x, 0, z);
+  g.rotation.y = yaw;
+  scene.add(g);
+}
+
+function addSignposts() {
+  // wayfinding at the entrance, facing the visitor (who looks -Z)
+  addSignpost(9.5, 49, 0, [
+    '↑  museo · lago',
+    '←  observatorio · anfiteatro',
+    'calesita de Almendra  →',
+  ]);
+  // museum nameplate across the lake
+  addSignpost(7, -60, 0, ['museo argentino de ciencias naturales'], { size: 0.6 });
+}
+
+function addPier() {
+  // a small wooden embarcadero at the lake's south edge
+  const g = new THREE.Group();
+  const wood = new THREE.MeshStandardMaterial({ color: 0x6f5536, roughness: 0.95, flatShading: true });
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.18, 12), wood);
+  deck.position.set(0, 0.5, 0);
+  g.add(deck);
+  for (let i = 0; i < 6; i++) {
+    [-1.1, 1.1].forEach((sx) => {
+      const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.1, 0.16), wood);
+      post.position.set(sx, 0.0, -5 + i * 2);
+      g.add(post);
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 11.5), wood);
+      rail.position.set(sx, 0.95, 0);
+      g.add(rail);
+    });
+  }
+  // the hidden heart plaque — for the whole family
+  const heart = makePlaque('para los Laurino  ♥', 0.24, { bg: '#7a5b9e', fg: '#fff', border: 'rgba(255,255,255,0.3)', metalness: 0.2 });
+  heart.position.set(0, 1.25, 5.5); // shore end, facing whoever walks up
+  g.add(heart);
+  g.traverse((m) => (m.castShadow = true));
+  g.position.set(13, 0, 19); // edge → out over the water
+  g.rotation.y = 0.2;
+  scene.add(g);
+}
+
+let kite = null;
+function addKite(x, z) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.3, 1.7),
+    new THREE.MeshStandardMaterial({ color: 0xe2483b, side: THREE.DoubleSide, roughness: 0.6 })
+  );
+  body.rotation.z = Math.PI / 4;
+  g.add(body);
+  const tailMat = new THREE.MeshStandardMaterial({ color: 0xf4d06b, side: THREE.DoubleSide });
+  for (let i = 0; i < 5; i++) {
+    const bow = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.16), tailMat);
+    bow.position.set(0, -1.05 - i * 0.42, 0);
+    bow.rotation.z = (i % 2 ? 1 : -1) * 0.5;
+    g.add(bow);
+  }
+  g.position.set(x, 15, z);
+  scene.add(g);
+  kite = { g, base: new THREE.Vector3(x, 15, z) };
+}
+
+/* ----------------------------------------------------------------------------
  * Build the world
  * ------------------------------------------------------------------------- */
 function buildWorld() {
@@ -1009,6 +1316,10 @@ function buildWorld() {
   addBenches();
   addFeria();
   addPergola();
+  addPier();
+  addSignposts();
+  addDedications();
+  addPeople();
 }
 
 /* ----------------------------------------------------------------------------
@@ -1244,8 +1555,21 @@ function tick() {
   timer.update();
   const dt = Math.min(timer.getDelta(), 0.05);
   updateControls(dt);
-  waterUniforms.uTime.value = timer.getElapsed();
+  const t = timer.getElapsed();
+  waterUniforms.uTime.value = t;
   if (calesitaSpinner) calesitaSpinner.rotation.y += dt * 0.25;
+  // strollers walking the lake loop
+  for (const w of peopleWalkers) {
+    w.a += w.spd * dt * 0.1;
+    w.g.position.set(Math.cos(w.a) * w.R, Math.sin(t * 8 + w.a * 50) * 0.03, Math.sin(w.a) * w.R);
+    w.g.rotation.y = -w.a + (w.spd > 0 ? 0 : Math.PI);
+  }
+  // the kite drifting over the calesita
+  if (kite) {
+    kite.g.position.y = kite.base.y + Math.sin(t * 0.8) * 0.7;
+    kite.g.position.x = kite.base.x + Math.sin(t * 0.5) * 1.3;
+    kite.g.rotation.z = Math.PI / 4 + Math.sin(t * 0.7) * 0.12;
+  }
   // drift waterfowl gently around the lake
   for (const b of birds) {
     b.phase += dt * b.spd;
@@ -1292,6 +1616,8 @@ function boot() {
   // set the camera's initial orientation
   updateControls(0);
   requestAnimationFrame(tick);
+  // tinkering hook (open the console and move the camera around)
+  window.__park = { camera, controls };
 
   const enterBtn = document.getElementById('enter');
   const loadline = document.getElementById('loadline');
