@@ -1,0 +1,244 @@
+:root {
+  --ink: #1c2118;
+  --paper: #f4f1e8;
+  --muted: rgba(244, 241, 232, 0.62);
+  --line: rgba(244, 241, 232, 0.22);
+  --jac: #8d7bd8; /* jacarandá */
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #0e1410;
+  color: var(--paper);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  outline: none;
+}
+
+/* ---------- overlays (intro + fallback) ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  background:
+    radial-gradient(120% 120% at 50% 18%, rgba(141, 123, 216, 0.18), transparent 55%),
+    linear-gradient(180deg, #1a2417 0%, #0e1410 100%);
+  transition: opacity 1s ease, filter 1s ease, transform 1s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* blur-zoom dissolve into the live scene (malamud-style) */
+#intro.go {
+  opacity: 0;
+  filter: blur(9px) brightness(1.35);
+  transform: scale(1.12);
+  pointer-events: none;
+}
+
+.intro-inner {
+  max-width: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.sitename {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.title {
+  font-weight: 600;
+  font-size: clamp(2.4rem, 9vw, 4.2rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 0.1rem 0 0.15rem;
+}
+
+.place {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.enter {
+  margin-top: 1.4rem;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: rgba(141, 123, 216, 0.16);
+  border: 1px solid var(--jac);
+  border-radius: 999px;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.enter:hover {
+  background: rgba(141, 123, 216, 0.32);
+  transform: translateY(-1px);
+}
+
+.enter:disabled {
+  opacity: 0.4;
+  cursor: progress;
+  border-color: var(--line);
+  background: transparent;
+}
+
+.legend {
+  list-style: none;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.legend b {
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.loadline {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  min-height: 1em;
+}
+
+/* ---------- hud (while walking) ---------- */
+.hud {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.hud.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip {
+  position: fixed;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  background: rgba(14, 20, 16, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+}
+
+.place-chip {
+  top: max(16px, env(safe-area-inset-top));
+  left: 16px;
+}
+
+.sound {
+  top: max(16px, env(safe-area-inset-top));
+  right: 16px;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.sound[aria-pressed="true"] {
+  color: var(--jac);
+  border-color: var(--jac);
+}
+
+.hint {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: max(18px, env(safe-area-inset-bottom));
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 0 16px;
+  max-width: 92vw;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  transition: opacity 1.2s ease;
+}
+
+.hint.fade {
+  opacity: 0;
+}
+
+.sig {
+  position: fixed;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.sig:hover {
+  color: var(--paper);
+}
+
+/* hide the verbose hint on small screens, keep it short */
+@media (max-width: 640px) {
+  .hint {
+    font-size: 0.62rem;
+  }
+  .legend {
+    font-size: 0.72rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .hud {
+    transition: none;
+  }
+}

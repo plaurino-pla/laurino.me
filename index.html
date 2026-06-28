@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>parque centenario · laurino.me</title>
+    <meta name="description" content="una caminata por el parque centenario, caballito, buenos aires." />
+    <meta name="theme-color" content="#9fb98a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- open graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="parque centenario · laurino.me" />
+    <meta property="og:description" content="una caminata por el parque centenario, caballito, buenos aires." />
+    <meta property="og:url" content="https://laurino.me" />
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+
+    <!-- intro / click-to-enter (also unlocks audio + pointer) -->
+    <div id="intro" class="overlay">
+      <div class="intro-inner">
+        <p class="sitename">laurino.me</p>
+        <h1 class="title">parque centenario</h1>
+        <p class="place">📍 caballito · buenos aires</p>
+
+        <button id="enter" class="enter">entrar a caminar</button>
+
+        <ul class="legend">
+          <li><b>wasd</b> / <b>flechas</b> — caminar</li>
+          <li><b>arrastrá</b> o <b>deslizá</b> — mirar</li>
+          <li><b>mantené pulsado</b> — avanzar</li>
+        </ul>
+
+        <p class="loadline" id="loadline">cargando el parque…</p>
+      </div>
+    </div>
+
+    <!-- heads-up display, shown while walking -->
+    <div id="hud" class="hud hidden">
+      <div class="chip place-chip">📍 parque centenario</div>
+      <button id="sound" class="chip sound" aria-pressed="false" title="sonido">♪ sonido</button>
+      <div class="hint">wasd / flechas: caminar · arrastrá o deslizá: mirar · mantené pulsado: avanzar</div>
+      <a class="sig" href="https://laurino.me">laurino.me</a>
+    </div>
+
+    <!-- webgl unsupported -->
+    <div id="fallback" class="overlay hidden">
+      <div class="intro-inner">
+        <h1 class="title">parque centenario</h1>
+        <p class="place">no se pudo iniciar webgl en este navegador.</p>
+        <p class="loadline">probá con chrome, firefox o safari actualizados.</p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
