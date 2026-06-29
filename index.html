@@ -33,11 +33,17 @@
         <h1 class="title">pablo laurino</h1>
         <p class="place">no es un sitio web — es una biblioteca infinita.</p>
 
+        <blockquote class="epigraph">
+          «el universo (que otros llaman la Biblioteca) se compone de un número
+          indefinido, y tal vez infinito, de galerías hexagonales…»
+          <span class="epigraph-cite">— jorge luis borges</span>
+        </blockquote>
+
         <button id="enter" class="enter">entrar</button>
 
         <ul class="legend">
           <li class="legend-controls">wasd / flechas para caminar · arrastrá para mirar · (celular: mantené pulsado)</li>
-          <li>acercate a los libros — <b>proyectos, ciudades, los míos</b></li>
+          <li>tocá un libro para <b>abrirlo</b> — proyectos, ciudades, los míos</li>
         </ul>
 
         <p class="loadline" id="loadline">ordenando los estantes…</p>
@@ -60,7 +66,21 @@
         <p class="card-kicker" id="cardKicker">proyecto</p>
         <h2 class="card-name" id="cardName"></h2>
         <p class="card-text" id="cardText"></p>
-        <a class="card-link hidden" id="cardLink" target="_blank" rel="noopener">abrir →</a>
+        <button class="card-open" id="cardOpen">abrir el libro <span aria-hidden="true">→</span></button>
+      </div>
+    </div>
+
+    <!-- the open book: a two-page spread, the heart of the interactivity -->
+    <div id="book" class="book hidden" role="dialog" aria-modal="true" aria-label="libro abierto">
+      <div class="book-backdrop" id="bookBackdrop"></div>
+      <div class="book-spread" role="document">
+        <button class="book-close" id="bookClose" aria-label="cerrar">cerrar <span aria-hidden="true">✕</span></button>
+        <div class="page page-left">
+          <p class="page-kicker" id="bookKicker"></p>
+          <h2 class="page-title" id="bookTitle"></h2>
+          <div class="page-lead" id="bookLead"></div>
+        </div>
+        <div class="page page-right" id="bookRight"></div>
       </div>
     </div>
 
@@ -68,7 +88,7 @@
     <div id="hud" class="hud hidden">
       <div class="chip place-chip" id="placeChip">📖 la biblioteca</div>
       <button id="sound" class="chip sound" aria-pressed="false" title="sonido">♪ sonido</button>
-      <div class="hint"><span class="kb">wasd / flechas: caminar · </span>arrastrá o deslizá: mirar<span class="touch"> · mantené pulsado: avanzar</span></div>
+      <div class="hint"><span class="kb">wasd: caminar · arrastrá: mirar · clic o E: abrir un libro</span><span class="touch">mantené pulsado: avanzar · tocá un libro: abrir</span></div>
       <a class="sig" href="https://laurino.me">pablo laurino</a>
     </div>
 

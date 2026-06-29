@@ -473,16 +473,395 @@ body {
   }
 }
 
+/* ---------- intro epigraph (the Borges seed) ---------- */
+.epigraph {
+  max-width: 27rem;
+  margin: 1.1rem auto 0.3rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgba(236, 224, 200, 0.78);
+  border-left: 2px solid var(--jac);
+  padding: 0.1rem 0 0.1rem 0.95rem;
+  text-align: left;
+}
+
+.epigraph-cite {
+  display: block;
+  margin-top: 0.4rem;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- the card's "open" button (replaces the old outbound link) ---------- */
+.card-open {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  color: var(--accent, #cdb9f2);
+  background: color-mix(in srgb, var(--accent, #cdb9f2) 14%, transparent);
+  border: 1px solid var(--accent, #cdb9f2);
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.card-open:hover {
+  background: color-mix(in srgb, var(--accent, #cdb9f2) 26%, transparent);
+  transform: translateY(-1px);
+}
+
+/* ---------- the open book: a two-page spread ---------- */
+.book {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 4vh 14px;
+}
+
+/* visibility is instant (no opacity gating) — the entrance is a transform sweep
+   on the spread, so it can't be hidden by background-tab animation throttling */
+.book.hidden {
+  display: none;
+}
+
+.book-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 120% at 50% 38%, rgba(24, 16, 8, 0.74), rgba(8, 6, 3, 0.92));
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+
+.book-spread {
+  --ink: #3a2616;
+  --ink-strong: #1c130a;
+  --brass-ink: #8a5a22;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(940px, 95vw);
+  height: min(600px, 84vh);
+  border-radius: 7px;
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", serif;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6), 0 2px 0 rgba(255, 245, 222, 0.3) inset;
+  transform-origin: center 60%;
+}
+
+/* play the open animation each time the book is un-hidden */
+.book:not(.hidden) .book-spread {
+  animation: bookOpen 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* accent ribbon (the book's identity colour) + the spine gutter shadow */
+.book-spread::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--accent, #c79a4e);
+  z-index: 3;
+}
+
+.book-spread::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 46px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(60, 40, 20, 0.2) 46%, rgba(40, 26, 12, 0.32) 50%, rgba(60, 40, 20, 0.2) 54%, transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes bookOpen {
+  from {
+    transform: perspective(1700px) rotateX(13deg) scale(0.93);
+  }
+  to {
+    transform: perspective(1700px) rotateX(0) scale(1);
+  }
+}
+
+.page {
+  padding: clamp(1.5rem, 3.4vw, 2.7rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  color: var(--ink);
+}
+
+.page-left {
+  background: linear-gradient(105deg, #f4e9d0 0%, #e7d8b6 100%);
+}
+
+.page-right {
+  background: linear-gradient(255deg, #f4e9d0 0%, #e7d8b6 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.05rem;
+}
+
+.page-kicker {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brass-ink);
+  margin-bottom: 0.5rem;
+}
+
+.page-title {
+  font-size: clamp(1.7rem, 4.2vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+  margin-bottom: 0.5rem;
+}
+
+.page-title::after {
+  content: "";
+  display: block;
+  width: 2.2rem;
+  height: 3px;
+  margin-top: 0.7rem;
+  background: var(--accent, #c79a4e);
+  border-radius: 2px;
+}
+
+.page-lead p {
+  font-size: clamp(0.96rem, 2.1vw, 1.06rem);
+  line-height: 1.62;
+  margin-top: 0.85rem;
+}
+
+.page-lead p:first-child {
+  margin-top: 0.2rem;
+}
+
+/* right-page content blocks */
+.page-quote {
+  font-size: clamp(1.05rem, 2.4vw, 1.28rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--ink-strong);
+  border-left: 3px solid var(--accent, #c79a4e);
+  padding-left: 1rem;
+}
+
+.page-cite {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--brass-ink);
+  line-height: 1.5;
+}
+
+.page-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.meta-row {
+  border-top: 1px solid rgba(90, 61, 34, 0.28);
+  padding-top: 0.55rem;
+}
+
+.meta-row dt {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-ink);
+  margin-bottom: 0.15rem;
+}
+
+.meta-row dd {
+  font-size: 1rem;
+  color: var(--ink-strong);
+}
+
+.page-list-title {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-ink);
+}
+
+.page-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: -0.2rem;
+}
+
+.page-list li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.pl-emoji {
+  font-size: 1.4rem;
+  line-height: 1.1;
+  flex: none;
+}
+
+.pl-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.pl-name {
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--ink-strong);
+}
+
+.pl-note {
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--ink);
+  opacity: 0.82;
+}
+
+.page-exlibris {
+  margin: auto auto 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  opacity: 0.9;
+}
+
+.ex-emoji {
+  font-size: 3.4rem;
+  filter: drop-shadow(0 3px 8px rgba(60, 40, 20, 0.3));
+}
+
+.ex-kind {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brass-ink);
+}
+
+.page-link {
+  align-self: flex-start;
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: #f4ead0;
+  text-decoration: none;
+  background: #241509;
+  border: 1px solid var(--accent, #c79a4e);
+  border-radius: 999px;
+  padding: 0.55rem 1.15rem;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.page-link:hover {
+  transform: translateY(-1px);
+  background: #34200c;
+}
+
+.book-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 4;
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: #f4ead0;
+  background: rgba(28, 19, 10, 0.66);
+  border: 1px solid rgba(244, 234, 208, 0.4);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  transition: background 0.18s ease;
+}
+
+.book-close:hover {
+  background: rgba(28, 19, 10, 0.9);
+}
+
+/* phones: stack the two pages, let the spread scroll as one column */
+@media (max-width: 720px) {
+  .book-spread {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    width: 95vw;
+    height: auto;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .book-spread::after {
+    display: none;
+  }
+  .page {
+    overflow-y: visible;
+  }
+  .page-left {
+    border-bottom: 1px solid rgba(90, 61, 34, 0.28);
+  }
+}
+
+@media (pointer: coarse) {
+  .card-open {
+    min-height: 44px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.82rem;
+  }
+  .book-close {
+    min-height: 40px;
+    padding: 0.55rem 1rem;
+  }
+  .page-link {
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .overlay,
   .hud,
   .cinematic,
-  .card {
+  .card,
+  .book {
     transition: none;
   }
   .cine-name,
   .cine-sub,
-  .skip {
+  .skip,
+  .book-spread {
     animation-duration: 0.01s;
   }
 }

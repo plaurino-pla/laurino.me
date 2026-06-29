@@ -39,50 +39,123 @@ function hexToRgba(hex, a) {
 
 const BOOKS = [
   { name: 'pablo laurino', emoji: '👋', kind: 'quién soy',
-    text: 'construí publica.la durante más de una década. hoy vivo inventando cosas nuevas. buenos aires, roma, scicli, cascais — las ciudades que llevo conmigo.',
-    url: 'mailto:plaurino@publica.la', linkLabel: 'escribime', accent: '#e9ddc2' },
+    text: 'construí publica.la durante más de una década. hoy vivo inventando cosas nuevas.',
+    url: 'mailto:plaurino@publica.la', linkLabel: 'escribime', accent: '#e9ddc2',
+    pages: {
+      lead: 'nací en buenos aires y pasé más de diez años construyendo publica.la. hoy me dedico a inventar cosas: apps, productos, ideas que todavía no existen.\n\nvivo entre ciudades —buenos aires, roma, scicli, cascais— y me las llevo todas conmigo. esta biblioteca es mi manera de contarme: cada libro es una parte de mi vida. abrilos.',
+      meta: [
+        { k: 'oficio', v: 'construir cosas que no existían' },
+        { k: 'base', v: 'buenos aires · caballito' },
+        { k: 'obra', v: 'publica.la · y lo que venga' },
+      ],
+    } },
+  { name: 'la biblioteca de babel', emoji: '🌀', kind: 'la inspiración',
+    text: 'esta biblioteca no es mía: es de borges. de acá salió todo.',
+    url: null, accent: '#c79a4e',
+    pages: {
+      lead: 'esta biblioteca no es mía: es de borges. en 1941 imaginó el universo como una biblioteca infinita de galerías hexagonales, con un pozo de ventilación en el medio y barandas bajísimas.\n\ncuando pensé cómo contar mi vida, no se me ocurrió mejor casa que esa. el pozo por el que bajaste, las barandas de bronce, los estantes que se pierden en la niebla: todo está en una sola frase suya. cada libro de acá es una sala de la mía.',
+      quote: 'El universo (que otros llaman la Biblioteca) se compone de un número indefinido, y tal vez infinito, de galerías hexagonales, con vastos pozos de ventilación en el medio, cercados por barandas bajísimas.',
+      cite: 'jorge luis borges · «la biblioteca de babel», ficciones (1941)',
+    } },
   { name: 'rd3', emoji: '📣', kind: 'el comienzo',
     text: 'mi primera agencia de marketing. acá empezó todo.',
-    url: null, accent: '#d98a4a' },
+    url: null, accent: '#d98a4a',
+    pages: {
+      lead: 'mi primera agencia de marketing. antes de publica.la, antes de todo.\n\nacá aprendí a vender una idea, a armar un equipo, a perder y volver a empezar. todo lo que vino después tiene su raíz en rd3.',
+    } },
   { name: 'mandarino', emoji: '汉', kind: 'proyecto',
     text: 'aprender mandarín como si fuera una historia, no una tarea.',
-    url: 'https://publicala.github.io/mandarino/pitch/', accent: '#e0a93b' },
+    url: 'https://publicala.github.io/mandarino/pitch/', linkLabel: 'ver el pitch', accent: '#e0a93b',
+    pages: {
+      lead: 'aprender mandarín como si fuera una historia y no una tarea. lecciones que se leen como cuentos, tono y pronunciación de verdad, y un lector adentro de la app.\n\nnació de una obsesión: hacer simple lo que parece imposible.',
+    } },
   { name: 'corpus', emoji: '📖', kind: 'proyecto',
     text: 'comprensión lectora con ia, adentro de los libros mismos.',
-    url: 'https://corpus.la', accent: '#5b8fb0' },
+    url: 'https://corpus.la', linkLabel: 'abrir corpus.la', accent: '#5b8fb0',
+    pages: {
+      lead: 'comprensión lectora con ia, adentro de los libros mismos. un lector que entiende lo que estás leyendo y te acompaña, en lugar de mandarte a otra pestaña.\n\npensado para vivir dentro de las tiendas de las editoriales.',
+    } },
   { name: 'invest like a girl', emoji: '💸', kind: 'proyecto',
     text: 'educación financiera para mujeres, en brasil.',
-    url: 'https://www.investlikeagirl.com.br', accent: '#cc6688' },
+    url: 'https://www.investlikeagirl.com.br', linkLabel: 'abrir el sitio', accent: '#cc6688',
+    pages: {
+      lead: 'educación financiera para mujeres, en brasil. una escuela de inversión que no asusta ni aburre: trilhas, comunidad y una voz que acompaña.\n\nplata sin misterio, contada por y para mujeres.',
+    } },
   { name: 'perfo', emoji: '📊', kind: 'proyecto',
     text: 'performance reviews que no le arruinan la semana a nadie.',
-    url: 'https://perforeview.com', accent: '#6f9e6a' },
+    url: 'https://perforeview.com', linkLabel: 'abrir perfo', accent: '#6f9e6a',
+    pages: {
+      lead: 'performance reviews que no le arruinan la semana a nadie. evaluaciones de equipo claras, rápidas y humanas, en vez del ritual burocrático de siempre.',
+    } },
   { name: 'publica.la', emoji: '📚', kind: 'lo más grande que construí', hero: true,
-    text: 'la empresa que construí durante más de 10 años: una plataforma de publishing digital que usan editoriales de todo el mundo.',
-    url: 'https://publica.la', accent: '#e6c45c' },
+    text: 'la plataforma de publishing digital que usan editoriales de todo el mundo.',
+    url: 'https://publica.la', linkLabel: 'abrir publica.la', accent: '#e6c45c',
+    pages: {
+      lead: 'lo más grande que construí. más de diez años levantando una plataforma de publishing digital que hoy usan editoriales de todo el mundo para vender, proteger y distribuir sus libros y revistas.\n\nempezó como una idea terca y se volvió mi obra mayor: un equipo, clientes en muchos países, una empresa de verdad. casi todo lo demás en esta biblioteca nació orbitando a publica.la.',
+      meta: [
+        { k: 'qué es', v: 'plataforma de publishing digital' },
+        { k: 'tiempo', v: 'más de 10 años' },
+        { k: 'alcance', v: 'editoriales de todo el mundo' },
+      ],
+    } },
   { name: 'gufo', emoji: '🦉', kind: 'proyecto',
     text: 'búsqueda instantánea para encontrar el libro dentro del catálogo.',
-    url: null, accent: '#9c7bd1' },
+    url: null, accent: '#9c7bd1',
+    pages: {
+      lead: 'búsqueda instantánea para encontrar el libro dentro del catálogo. escribís y aparece, sin esperar.\n\nun buscador chiquito y obsesivo que vive en las tiendas de publica.la.',
+    } },
   { name: 'fridgechef', emoji: '🍳', kind: 'proyecto',
     text: 'decime qué hay en la heladera y te digo qué cocinar.',
-    url: null, accent: '#c45b4a' },
+    url: null, accent: '#c45b4a',
+    pages: {
+      lead: 'decime qué hay en la heladera y te digo qué cocinar. una app para esos días de «no sé qué hacer de comer» con lo que ya tenés.\n\nnació de un problema doméstico, como las mejores ideas.',
+    } },
   { name: "bib's crew", emoji: '☕', kind: 'proyecto',
     text: 'el café que estamos comprando, contado para inversores.',
-    url: null, accent: '#b5763b' },
+    url: null, accent: '#b5763b',
+    pages: {
+      lead: 'el café que estamos comprando, contado para inversores. un proyecto de barrio, de mesa de madera y olor a tostado, con los números arriba de la mesa.\n\nla parte mía que no es software.',
+    } },
   { name: 'buenos aires', emoji: '🏙️', kind: 'casa · 0 km',
     text: 'caballito. la ciudad donde todo esto pasa.',
-    url: null, accent: '#74b6db' },
+    url: null, accent: '#74b6db',
+    pages: {
+      lead: 'caballito. mi barrio, mi punto cero, la ciudad donde todo esto pasa y a la que siempre vuelvo.\n\ncafés con mesa de mármol, librerías de viejo, el subte, el parque a la vuelta. si esta biblioteca tiene un suelo, es porteño.',
+      list: { title: 'mis rincones', items: [
+        { emoji: '🌳', name: 'parque centenario', note: 'mi parque. antes este mismo sitio era una caminata por acá' },
+        { emoji: '🏠', name: 'caballito', note: 'el barrio donde está mi casa' },
+        { emoji: '📚', name: 'librerías de viejo', note: 'donde se me va el tiempo' },
+      ] },
+    } },
   { name: 'roma', emoji: '🏛️', kind: 'un lugar · 11.100 km',
     text: 'la ciudad eterna. piedra dorada, pinos y el sol cayendo bajo.',
-    url: null, accent: '#c46a3f' },
+    url: null, accent: '#c46a3f',
+    pages: {
+      lead: 'la ciudad eterna. piedra dorada, pinos romanos y el sol cayendo bajo sobre los tejados.\n\nroma no se visita, se respira. me cambió la idea de lo que el tiempo le hace a las cosas.',
+    } },
   { name: 'scicli', emoji: '⛪', kind: 'un lugar · 11.500 km',
     text: 'el sur profundo de sicilia. barroco color miel y el mar ahí nomás.',
-    url: null, accent: '#d9b768' },
+    url: null, accent: '#d9b768',
+    pages: {
+      lead: 'el sur profundo de sicilia. barroco color miel, callecitas que suben y el mediterráneo ahí nomás.\n\nun pueblo que parece detenido y que, sin embargo, se te queda adentro.',
+    } },
   { name: 'cascais', emoji: '🌊', kind: 'un lugar · 9.900 km',
     text: 'el atlántico portugués. luz blanca, viento de mar y olas.',
-    url: null, accent: '#3f8aa0' },
+    url: null, accent: '#3f8aa0',
+    pages: {
+      lead: 'el atlántico portugués. luz blanca, viento de mar, olas frías y la calma de un pueblo de costa.\n\nel lugar donde el océano me ordena la cabeza.',
+    } },
   { name: 'los míos', emoji: '🤍', kind: 'familia',
     text: 'lo que sostiene todo lo demás.',
-    url: null, accent: '#e0b48a' },
+    url: null, accent: '#e0b48a',
+    pages: {
+      lead: 'lo que sostiene todo lo demás. ningún proyecto de esta biblioteca existiría sin la gente que me banca todos los días.\n\nsi todo lo otro es lo que hago, esto es lo que soy.',
+      list: { title: 'los míos', items: [
+        { emoji: '❤️', name: 'caroline', note: 'mi compañera. la que hace que todo lo demás tenga sentido' },
+        { emoji: '👨‍👩‍👧', name: 'mi familia', note: 'mi raíz y mi refugio' },
+        { emoji: '🤍', name: 'los de siempre', note: 'la familia que uno elige' },
+      ] },
+    } },
 ];
 
 /* ----------------------------------------------------------------------------
@@ -453,6 +526,7 @@ function makeBookCover(name, accentHex) {
  * The lit "life" books — one per BOOKS entry, glowing on the shelves
  * ------------------------------------------------------------------------- */
 const glowBooks = [];
+const bookGroups = []; // meshes for click-to-open raycasting
 
 function addLifeBooks() {
   const n = BOOKS.length;
@@ -507,12 +581,13 @@ function addLifeBooks() {
 
     g.position.set(Math.cos(a) * RB, EYE + (hero ? 0.25 : 0.0), Math.sin(a) * RB);
     g.lookAt(0, g.position.y, 0); // the glowing cover faces the centre / the walker
+    g.userData.bookIndex = i;
     scene.add(g);
+    bookGroups.push(g);
 
+    const rec = { book: b, g, pl, baseLight: pl.intensity, haloBase: halo.material.opacity, halo };
     glowBooks.push({ g, base: g.position.y, phase: i * 1.3, halo, haloBase: halo.material.opacity });
-    registerInteractable(Math.cos(a) * (RB - 0.4), Math.sin(a) * (RB - 0.4), hero ? 4.2 : 3.3, {
-      kind: b.kind, name: b.name, text: b.text, emoji: b.emoji, url: b.url, accent: b.accent, linkLabel: b.linkLabel,
-    });
+    registerInteractable(Math.cos(a) * (RB - 0.4), Math.sin(a) * (RB - 0.4), hero ? 4.2 : 3.3, rec);
   });
 }
 
@@ -594,27 +669,16 @@ function registerInteractable(x, z, r, data) {
 const cardEl = document.getElementById('card');
 let activeIt = null;
 
-function showCard(d) {
-  const accent = d.accent || '#cdb9f2';
-  cardEl.style.setProperty('--accent', accent);
-  document.getElementById('cardEmoji').textContent = d.emoji || '•';
-  document.getElementById('cardKicker').textContent = d.kind || '';
-  document.getElementById('cardName').textContent = d.name || '';
-  document.getElementById('cardText').textContent = d.text || '';
-  const link = document.getElementById('cardLink');
-  if (d.url) {
-    link.href = d.url;
-    link.innerHTML = `${d.linkLabel || 'abrir'} <span aria-hidden="true">→</span>`;
-    const h = parseInt(accent.replace('#', ''), 16);
-    const lum = (0.299 * ((h >> 16) & 255) + 0.587 * ((h >> 8) & 255) + 0.114 * (h & 255)) / 255;
-    link.style.color = lum > 0.62 ? '#1c130a' : '#f0e6cf';
-    link.classList.remove('hidden');
-  } else {
-    link.classList.add('hidden');
-  }
+function showCard(rec) {
+  const b = rec.book;
+  cardEl.style.setProperty('--accent', b.accent || '#cdb9f2');
+  document.getElementById('cardEmoji').textContent = b.emoji || '•';
+  document.getElementById('cardKicker').textContent = b.kind || '';
+  document.getElementById('cardName').textContent = b.name || '';
+  document.getElementById('cardText').textContent = b.text || '';
   cardEl.classList.remove('hidden');
   const chip = document.getElementById('placeChip');
-  if (chip) chip.textContent = `📖 ${d.name || 'la biblioteca'}`;
+  if (chip) chip.textContent = `📖 ${b.name || 'la biblioteca'}`;
 }
 function hideCard() {
   cardEl.classList.add('hidden');
@@ -623,7 +687,7 @@ function hideCard() {
 }
 
 function updateProximity() {
-  if (!controls.active) return;
+  if (!controls.active || bookOpen) return;
   const px = camera.position.x;
   const pz = camera.position.z;
   let best = null;
@@ -645,6 +709,97 @@ function updateProximity() {
     activeIt = null;
     hideCard();
   }
+}
+
+/* ----------------------------------------------------------------------------
+ * Open the book — a two-page spread (the heart of the interactivity)
+ * ------------------------------------------------------------------------- */
+const bookEl = document.getElementById('book');
+let bookOpen = false;
+let openedRec = null;
+
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function buildRightPage(b) {
+  const p = b.pages || {};
+  const hasQuote = !!p.quote;
+  const hasMeta = !!(p.meta && p.meta.length);
+  const hasList = !!(p.list && p.list.items && p.list.items.length);
+  let html = '';
+  // a sparse right page gets an ornamental ex-libris so it never looks empty
+  if (!hasQuote && !hasMeta && !hasList) {
+    html += `<div class="page-exlibris"><span class="ex-emoji">${b.emoji || '📖'}</span><span class="ex-kind">${esc(b.kind || '')}</span></div>`;
+  }
+  if (hasQuote) {
+    html += `<blockquote class="page-quote">${esc(p.quote)}</blockquote>`;
+    if (p.cite) html += `<p class="page-cite">${esc(p.cite)}</p>`;
+  }
+  if (hasMeta) {
+    html += '<dl class="page-meta">';
+    for (const m of p.meta) html += `<div class="meta-row"><dt>${esc(m.k)}</dt><dd>${esc(m.v)}</dd></div>`;
+    html += '</dl>';
+  }
+  if (hasList) {
+    if (p.list.title) html += `<p class="page-list-title">${esc(p.list.title)}</p>`;
+    html += '<ul class="page-list">';
+    for (const it of p.list.items) {
+      html += `<li><span class="pl-emoji">${it.emoji || '•'}</span><span class="pl-body"><span class="pl-name">${esc(it.name)}</span><span class="pl-note">${esc(it.note || '')}</span></span></li>`;
+    }
+    html += '</ul>';
+  }
+  if (b.url) {
+    html += `<a class="page-link" href="${b.url}" target="_blank" rel="noopener">${esc(b.linkLabel || 'abrir')} <span aria-hidden="true">→</span></a>`;
+  }
+  return html;
+}
+
+function openBook(rec) {
+  if (!rec || bookOpen) return;
+  const b = rec.book;
+  openedRec = rec;
+  bookOpen = true;
+  bookEl.style.setProperty('--accent', b.accent || '#c79a4e');
+  document.getElementById('bookKicker').textContent = b.kind || '';
+  document.getElementById('bookTitle').textContent = b.name || '';
+  const lead = (b.pages && b.pages.lead) || b.text || '';
+  document.getElementById('bookLead').innerHTML = lead.split(/\n\n+/).map((para) => `<p>${esc(para)}</p>`).join('');
+  document.getElementById('bookRight').innerHTML = buildRightPage(b);
+  bookEl.classList.remove('hidden');
+  controls.active = false; // freeze the walk while reading
+  hideCard();
+  if (rec.pl) rec.pl.intensity = rec.baseLight * 1.9; // flare the opened book
+  if (audio.on && audio.onePage) audio.onePage(); // a soft page turn
+}
+
+function closeBook() {
+  if (!bookOpen) return;
+  bookOpen = false;
+  bookEl.classList.add('hidden');
+  if (openedRec && openedRec.pl) openedRec.pl.intensity = openedRec.baseLight;
+  openedRec = null;
+  if (!cine.playing) controls.active = true;
+}
+
+// click / tap a glowing book anywhere in the rotunda to open it
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+function bookAtPointer(clientX, clientY) {
+  ndc.x = (clientX / innerWidth) * 2 - 1;
+  ndc.y = -(clientY / innerHeight) * 2 + 1;
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObjects(bookGroups, true);
+  for (const h of hits) {
+    let o = h.object;
+    while (o && o.userData.bookIndex === undefined) o = o.parent;
+    if (o && h.distance < 34) return interactables.find((it) => it.data.g === o);
+  }
+  return null;
+}
+function tryOpenAt(clientX, clientY) {
+  if (bookOpen || !controls.active || cine.playing) return;
+  const it = bookAtPointer(clientX, clientY);
+  if (it) openBook(it.data);
+  else if (activeIt) openBook(activeIt.data);
 }
 
 /* ----------------------------------------------------------------------------
@@ -689,16 +844,23 @@ function bindControls() {
   let dragId = null;
   let lx = 0;
   let ly = 0;
+  let downX = 0;
+  let downY = 0;
+  let downT = 0;
+  let moved = 0;
   canvas.addEventListener('pointerdown', (e) => {
-    if (dragId !== null) return;
+    if (dragId !== null || bookOpen) return;
     dragId = e.pointerId;
-    lx = e.clientX;
-    ly = e.clientY;
+    lx = downX = e.clientX;
+    ly = downY = e.clientY;
+    downT = performance.now();
+    moved = 0;
     if (e.pointerType === 'touch') controls.touchWalk = true;
     canvas.setPointerCapture(e.pointerId);
   });
   canvas.addEventListener('pointermove', (e) => {
     if (e.pointerId !== dragId) return;
+    moved += Math.abs(e.clientX - lx) + Math.abs(e.clientY - ly);
     controls.lookDX += e.clientX - lx;
     controls.lookDY += e.clientY - ly;
     lx = e.clientX;
@@ -709,7 +871,12 @@ function bindControls() {
     dragId = null;
     controls.touchWalk = false;
   };
-  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointerup', (e) => {
+    if (e.pointerId !== dragId) return;
+    const isTap = performance.now() - downT < 400 && moved < 9;
+    end(e);
+    if (isTap) tryOpenAt(downX, downY); // a click/tap (not a drag) opens a book
+  });
   canvas.addEventListener('pointercancel', end);
 }
 
@@ -818,9 +985,9 @@ function startAudio() {
   lfo.connect(lfoG).connect(lp.frequency);
   lfo.start();
 
-  // occasional soft page turn / whisper (filtered noise burst → reverb)
-  const page = () => {
-    if (!audio.on || !audio.ctx) return;
+  // a single soft page turn / whisper (filtered noise burst → reverb)
+  const onePage = (boost = 1) => {
+    if (!audio.ctx) return;
     const t = ctx.currentTime;
     const n = ctx.createBufferSource();
     n.buffer = makeImpulse(ctx, 0.4, 1.2);
@@ -830,13 +997,19 @@ function startAudio() {
     bp.Q.value = 0.8;
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.05 + Math.random() * 0.04, t + 0.02);
+    g.gain.linearRampToValueAtTime((0.05 + Math.random() * 0.04) * boost, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
     n.connect(bp).connect(g);
     g.connect(verb);
     g.connect(master);
     n.start(t);
     n.stop(t + 0.45);
+  };
+  audio.onePage = () => onePage(2.1); // a louder turn when you open a book
+  // occasional ambient page turns drifting through the stacks
+  const page = () => {
+    if (!audio.on || !audio.ctx) return;
+    onePage();
     audio.pageTimer = setTimeout(page, 2600 + Math.random() * 6000);
   };
   audio.pageTimer = setTimeout(page, 1800);
@@ -868,9 +1041,13 @@ function tick() {
   const t = timer.getElapsed();
 
   // breathe the books' glow + slowly drift the floating volumes
+  const k = Math.min(1, dt * 7);
   for (const b of glowBooks) {
-    b.halo.material.opacity = b.haloBase + Math.sin(t * 1.4 + b.phase) * 0.05;
+    const opened = openedRec && openedRec.g === b.g;
+    b.halo.material.opacity = (opened ? b.haloBase + 0.16 : b.haloBase) + Math.sin(t * 1.4 + b.phase) * 0.05;
     b.g.position.y = b.base + Math.sin(t * 0.6 + b.phase) * 0.04;
+    const s = b.g.scale.x + ((opened ? 1.14 : 1) - b.g.scale.x) * k; // lift the opened book
+    b.g.scale.setScalar(s);
   }
   for (const f of floaters) {
     f.g.rotation.y += f.spin * dt;
@@ -993,7 +1170,7 @@ function boot() {
   bindControls();
   updateControls(0);
   requestAnimationFrame(tick);
-  window.__park = { camera, controls }; // tinkering hook
+  window.__park = { camera, controls, openBook, closeBook, interactables }; // tinkering hook
 
   const enterBtn = document.getElementById('enter');
   const loadline = document.getElementById('loadline');
@@ -1001,12 +1178,26 @@ function boot() {
   enterBtn.disabled = false;
   enterBtn.addEventListener('click', enterScene);
   addEventListener('keydown', (e) => {
-    if ((e.code === 'Enter' || e.code === 'Space') && !controls.active && !cine.playing) enterScene();
-    if (e.code === 'Escape' && cine.playing) finishIntro();
+    if ((e.code === 'Enter' || e.code === 'Space') && !controls.active && !cine.playing && !bookOpen) {
+      enterScene();
+      return;
+    }
+    if (e.code === 'Escape') {
+      if (bookOpen) closeBook();
+      else if (cine.playing) finishIntro();
+      return;
+    }
+    // E or Enter opens the book you're standing at
+    if ((e.code === 'KeyE' || e.code === 'Enter') && controls.active && !bookOpen && activeIt) openBook(activeIt.data);
   });
   document.getElementById('skip').addEventListener('click', finishIntro);
   document.getElementById('cinematic').addEventListener('pointerdown', finishIntro);
   document.getElementById('sound').addEventListener('click', () => setAudio(!audio.on));
+
+  // open-book spread: the card's button opens it; ✕ / backdrop / esc close it
+  document.getElementById('cardOpen').addEventListener('click', () => { if (activeIt) openBook(activeIt.data); });
+  document.getElementById('bookClose').addEventListener('click', closeBook);
+  document.getElementById('bookBackdrop').addEventListener('click', closeBook);
 }
 
 document.getElementById('enter').disabled = true;
