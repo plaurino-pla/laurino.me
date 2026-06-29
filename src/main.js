@@ -69,6 +69,11 @@ const OBSTACLES = [
   { x: 60, z: 30, r: 6 }, // calesita
   { x: 44, z: 42, r: 3.4 }, // La Aurora monument
   { x: 0, z: -25, r: 2.6 }, // Victoria Alada
+  { x: -22, z: 46, r: 3 }, // Buenos Aires — obelisco
+  { x: -58, z: 30, r: 3 }, // Roma — column
+  { x: -38, z: 64, r: 3.2 }, // Scicli — campanile
+  { x: 60, z: 4, r: 3 }, // Cascais — lighthouse
+  { x: 40, z: 50, r: 4 }, // rd3 — atelier
 ];
 
 const isOnWater = (x, z) =>
@@ -95,6 +100,80 @@ function nearPath(x, z) {
 }
 
 /* ----------------------------------------------------------------------------
+ * Content — the walkable portrait (projects, the institution, who I am, family)
+ * Everything personal lives here: names, one-liners, links, accents. Edit freely.
+ * ------------------------------------------------------------------------- */
+function hexToRgba(hex, a) {
+  const h = typeof hex === 'string' ? parseInt(hex.replace('#', ''), 16) : hex;
+  return `rgba(${(h >> 16) & 255}, ${(h >> 8) & 255}, ${h & 255}, ${a})`;
+}
+
+// the feria stalls along the entrance promenade — each one is a project.
+// slot = side R(+x)/L(-x) + row 0..3 (row 0 is nearest the entrance).
+const PROJECTS = [
+  { slot: 'R0', name: 'mandarino', emoji: '汉', kind: 'proyecto',
+    text: 'aprender mandarín como si fuera una historia, no una tarea.',
+    url: 'https://publicala.github.io/mandarino/pitch/', accent: '#e0a93b' },
+  { slot: 'L0', name: 'corpus', emoji: '📖', kind: 'proyecto',
+    text: 'comprensión lectora con ia, adentro de los libros mismos.',
+    url: 'https://corpus.la', accent: '#5b8fb0' },
+  { slot: 'R1', name: 'invest like a girl', emoji: '💸', kind: 'proyecto',
+    text: 'educación financiera para mujeres, en brasil.',
+    url: 'https://www.investlikeagirl.com.br', accent: '#cc6688' },
+  { slot: 'L1', name: 'perfo', emoji: '📊', kind: 'proyecto',
+    text: 'performance reviews que no le arruinan la semana a nadie.',
+    url: 'https://perforeview.com', accent: '#6f9e6a' },
+  { slot: 'R2', name: 'gufo', emoji: '🦉', kind: 'proyecto',
+    text: 'búsqueda instantánea para encontrar el libro dentro del catálogo.',
+    url: null, accent: '#9c7bd1' },
+  { slot: 'L2', name: 'fridgechef', emoji: '🍳', kind: 'proyecto',
+    text: 'decime qué hay en la heladera y te digo qué cocinar.',
+    url: null, accent: '#c45b4a' },
+  { slot: 'R3', name: "bib's crew", emoji: '☕', kind: 'proyecto',
+    text: 'el café que estamos comprando, contado para inversores.',
+    url: null, accent: '#b5763b' },
+  { slot: 'L3', name: 'este parque', emoji: '🌳', kind: 'hecho a mano',
+    text: 'lo que estás caminando: three.js, cero assets, todo geometría.',
+    url: 'https://github.com/plaurino-pla/laurino.me', linkLabel: 'ver el código', accent: '#8fb857' },
+];
+
+// promenade rows (z descending = farther from the entrance), x offset
+const STALL_X = 6.8;
+const STALL_Z = [49.5, 44, 38.5, 33];
+
+// the museum = the magnum opus; the observatory = who I am; warm tone for family
+const INSTITUTION = {
+  name: 'publica.la', emoji: '📚', kind: 'lo más grande que construí',
+  text: 'la empresa que construí durante más de 10 años: una plataforma de publishing digital que usan editoriales de todo el mundo.',
+  url: 'https://publica.la', accent: '#d8c29a',
+};
+const ABOUT = {
+  name: 'pablo laurino', emoji: '👋', kind: 'quién soy',
+  text: 'construí publica.la durante más de una década. hoy vivo inventando cosas nuevas, a la vuelta de este parque. buenos aires, roma, scicli, cascais — las ciudades que llevo conmigo.',
+  url: 'mailto:plaurino@publica.la', linkLabel: 'escribime', accent: '#cdb9f2',
+};
+const FAMILY_ACCENT = '#e0b48a';
+
+// rd3 — where the whole story started (a small atelier near the entrance)
+const RD3 = {
+  name: 'rd3', emoji: '📣', kind: 'mi primera agencia', x: 40, z: 50, accent: '#d98a4a',
+  text: 'mi primera agencia de marketing. acá empezó todo.', url: null,
+};
+
+// the cities of my life — each one a small monument you can walk up to.
+// (copy is evocative-of-the-place; swap in your own story.)
+const PLACES = [
+  { name: 'buenos aires', km: 'casa · 0 km', x: -22, z: 46, accent: '#74b6db', emoji: '🏙️', kind: 'casa',
+    text: 'caballito. estás parado, justo ahora, en el parque de mi barrio.' },
+  { name: 'roma', km: '11.100 km', x: -58, z: 30, accent: '#c46a3f', emoji: '🏛️', kind: 'un lugar',
+    text: 'la ciudad eterna. piedra dorada, pinos y el sol cayendo bajo.' },
+  { name: 'scicli', km: '11.500 km', x: -38, z: 64, accent: '#d9b768', emoji: '⛪', kind: 'un lugar',
+    text: 'el sur profundo de sicilia. barroco color miel y el mar ahí nomás.' },
+  { name: 'cascais', km: '9.900 km', x: 60, z: 4, accent: '#3f8aa0', emoji: '🌊', kind: 'un lugar',
+    text: 'el atlántico portugués. luz blanca, viento de mar y olas.' },
+];
+
+/* ----------------------------------------------------------------------------
  * Renderer / scene / camera
  * ------------------------------------------------------------------------- */
 const canvas = document.getElementById('scene');
@@ -111,7 +190,10 @@ try {
   webglFailed();
   throw e;
 }
-if (!renderer || !renderer.getContext()) webglFailed();
+if (!renderer || !renderer.getContext()) {
+  webglFailed();
+  throw new Error('WebGL unavailable');
+}
 
 renderer.setPixelRatio(Math.min(devicePixelRatio, isCoarse ? 1.5 : 2));
 renderer.setSize(innerWidth, innerHeight);
@@ -565,8 +647,17 @@ function addMuseum() {
     g.add(st);
   }
 
+  // publica.la — the institution, lettered across the facade, facing the park
+  const pubSign = makePlaque('publica.la', 1.5, {
+    bg: '#2b2620', fg: '#f1e9d8', family: 'Georgia, "Times New Roman", serif', weight: '700',
+    border: hexToRgba('#d8c29a', 0.85), metalness: 0.2,
+  });
+  pubSign.position.set(0, 13.6, 8.95);
+  g.add(pubSign);
+
   g.position.set(0, 0, -78);
   scene.add(g);
+  registerInteractable(0, -55, 11, INSTITUTION);
 }
 
 function addAmphitheatre() {
@@ -680,6 +771,7 @@ function addObservatory() {
   g.position.set(-74, 0, 6);
   g.rotation.y = Math.atan2(74, -6); // entrance/dome/scope face the park centre
   scene.add(g);
+  registerInteractable(-66, 6, 9, ABOUT); // the observatory = who I am
 }
 
 function addCalesita() {
@@ -771,6 +863,10 @@ function addCalesita() {
   scene.add(g);
   calesitaSpinner = spinner;
   addKite(66, 37);
+  registerInteractable(60, 30, 8, {
+    kind: 'familia', name: 'almendra', emoji: '🎠',
+    text: 'la calesita del parque es de ella.', url: null, accent: FAMILY_ACCENT,
+  });
 }
 let calesitaSpinner = null;
 
@@ -952,19 +1048,82 @@ function addBenches() {
   }
 }
 
+const STALL_ACCENTS = [C.feriaRed, C.feriaBlue, C.feriaOchre, 0xf4ecd8, 0x6f9e6a];
+
+// a feria stall that is a project — accent canopy + a hanging name banner + a placard
+function addProjectStall(x, z, rot, p) {
+  const g = new THREE.Group();
+  const legs = new THREE.Mesh(
+    new THREE.BoxGeometry(2.4, 0.9, 1.2),
+    new THREE.MeshStandardMaterial({ color: 0x6a5a3a, roughness: 1 })
+  );
+  legs.position.y = 0.45;
+  g.add(legs);
+  const canopy = new THREE.Mesh(
+    new THREE.BoxGeometry(2.9, 0.14, 1.9),
+    new THREE.MeshStandardMaterial({ color: new THREE.Color(p.accent), roughness: 0.8 })
+  );
+  canopy.position.y = 2.25;
+  g.add(canopy);
+  [-1.25, 1.25].forEach((sx) =>
+    [-0.78, 0.78].forEach((sz) => {
+      const post = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.05, 0.05, 1.35, 5),
+        new THREE.MeshStandardMaterial({ color: 0x4a4a4a })
+      );
+      post.position.set(sx, 1.57, sz);
+      g.add(post);
+    })
+  );
+  for (let i = 0; i < 5; i++) {
+    const goods = new THREE.Mesh(
+      new THREE.BoxGeometry(0.35, 0.25, 0.5),
+      new THREE.MeshStandardMaterial({ color: STALL_ACCENTS[(i * 2) % STALL_ACCENTS.length], roughness: 0.9 })
+    );
+    goods.position.set(-0.9 + i * 0.42, 1.05, 0);
+    g.add(goods);
+  }
+  // hanging name banner, facing the central walkway (local +z)
+  const banner = makePlaque(p.name, 0.46, {
+    bg: '#23201a',
+    fg: '#f4f1e8',
+    family: 'ui-monospace, "SF Mono", Menlo, monospace',
+    weight: '700',
+    border: hexToRgba(p.accent, 0.95),
+    metalness: 0.15,
+  });
+  banner.position.set(0, 2.82, 0.96);
+  g.add(banner);
+
+  g.position.set(x, 0, z);
+  g.rotation.y = rot;
+  g.traverse((m) => (m.castShadow = true));
+  scene.add(g);
+
+  registerInteractable(x, z, 6.4, {
+    kind: p.kind, name: p.name, text: p.text,
+    emoji: p.emoji, url: p.url, accent: p.accent, linkLabel: p.linkLabel,
+  });
+}
+
 function addFeria() {
-  // rows of market stalls along the +Z promenade and part of the outer ring
-  const accents = [C.feriaRed, C.feriaBlue, C.feriaOchre, 0xf4ecd8, 0x6f9e6a];
+  // the entrance promenade: every stall is one of my projects
+  PROJECTS.forEach((p) => {
+    const side = p.slot[0] === 'R' ? 1 : -1;
+    const row = +p.slot[1];
+    const x = side * STALL_X;
+    const z = STALL_Z[row];
+    const rot = side > 0 ? -Math.PI / 2 : Math.PI / 2; // banner faces the walkway
+    addProjectStall(x, z, rot, p);
+  });
+
+  // a generic feria arc along the outer ring (east) for ambiance
   const mkStall = (x, z, rot, color) => {
     const g = new THREE.Group();
     const legs = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 1.2), new THREE.MeshStandardMaterial({ color: 0x6a5a3a, roughness: 1 }));
     legs.position.y = 0.45;
     g.add(legs);
-    // canopy
-    const canopy = new THREE.Mesh(
-      new THREE.BoxGeometry(2.8, 0.12, 1.8),
-      new THREE.MeshStandardMaterial({ color, roughness: 0.85 })
-    );
+    const canopy = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.12, 1.8), new THREE.MeshStandardMaterial({ color, roughness: 0.85 }));
     canopy.position.y = 2.2;
     g.add(canopy);
     [-1.2, 1.2].forEach((sx) =>
@@ -974,12 +1133,8 @@ function addFeria() {
         g.add(post);
       })
     );
-    // goods (little colored boxes = books/crafts)
     for (let i = 0; i < 5; i++) {
-      const goods = new THREE.Mesh(
-        new THREE.BoxGeometry(0.35, 0.25, 0.5),
-        new THREE.MeshStandardMaterial({ color: accents[(Math.random() * accents.length) | 0], roughness: 0.9 })
-      );
+      const goods = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.25, 0.5), new THREE.MeshStandardMaterial({ color: STALL_ACCENTS[(Math.random() * STALL_ACCENTS.length) | 0], roughness: 0.9 }));
       goods.position.set(-0.9 + i * 0.42, 1.05, 0);
       g.add(goods);
     }
@@ -988,17 +1143,9 @@ function addFeria() {
     g.traverse((m) => (m.castShadow = true));
     scene.add(g);
   };
-
-  // two rows flanking the promenade (+Z), between the lake ring and the spawn
-  for (let i = 0; i < 5; i++) {
-    const z = 33 + i * 4.6;
-    mkStall(-6.8, z, Math.PI / 2, accents[i % accents.length]);
-    mkStall(6.8, z, -Math.PI / 2, accents[(i + 2) % accents.length]);
-  }
-  // an arc of stalls along the outer ring (east side)
   for (let k = 0; k < 8; k++) {
     const a = -0.3 + k * 0.16;
-    mkStall(Math.cos(a) * 78, Math.sin(a) * 78, -a, accents[k % accents.length]);
+    mkStall(Math.cos(a) * 78, Math.sin(a) * 78, -a, STALL_ACCENTS[k % STALL_ACCENTS.length]);
   }
 }
 
@@ -1088,9 +1235,16 @@ function makePlaque(text, height, opts = {}) {
     map: tex,
     roughness: 0.45,
     metalness: opts.metalness ?? 0.35,
-    side: THREE.DoubleSide,
+    side: THREE.FrontSide,
   });
-  return new THREE.Mesh(new THREE.PlaneGeometry(height * aspect, height), mat);
+  const geo = new THREE.PlaneGeometry(height * aspect, height);
+  // two single-sided faces back-to-back so the label reads correctly from BOTH
+  // sides (a single DoubleSide plane shows mirrored glyphs from behind).
+  const front = new THREE.Mesh(geo, mat);
+  const back = new THREE.Mesh(geo, mat);
+  back.rotation.y = Math.PI;
+  front.add(back);
+  return front;
 }
 
 const SKIN = [0xc89a6a, 0xe0b48a, 0x9c6f4a, 0xd6a87f];
@@ -1157,10 +1311,11 @@ function addPeople() {
     scene.add(p);
     peopleWalkers.push({ g: p, R: 31, a, spd: (i % 2 ? 1 : -1) * (0.12 + Math.random() * 0.06) });
   }
-  // a few standing near the feria / museum / promenade
-  place(makePerson(), -9, 36, -1.6);
-  place(makePerson(), 9, 41, 1.6);
-  place(makePerson(), 4, 50, Math.PI);
+  // a few standing near the feria / museum / promenade — kept off the stall
+  // columns (x = ±6.8) and the central walkway so they never block a project
+  place(makePerson(), -12, 34, -1.0);
+  place(makePerson(), 12, 39, 2.2);
+  place(makePerson(), 11, 52, -2.0);
   place(makePerson(), -3, -16, 0); // by the lake, looking at the statue
   place(makePerson(), 5, -52, 0.4); // near the museum steps
   // seated folks on the lakeside benches (matches addBenches ring r34)
@@ -1198,6 +1353,10 @@ function addDedicationBench(name, angle, radius = 39) {
   g.position.set(x, 0, z);
   g.rotation.y = Math.atan2(-x, -z); // seat (and plaque) face the lake / the loop path
   scene.add(g);
+  registerInteractable(x, z, 4.8, {
+    kind: 'familia', name, emoji: '🌸',
+    text: 'un banco con su nombre, mirando el lago.', url: null, accent: FAMILY_ACCENT,
+  });
 }
 
 function addDedications() {
@@ -1239,12 +1398,12 @@ function addSignpost(x, z, yaw, lines, opts = {}) {
 function addSignposts() {
   // wayfinding at the entrance, facing the visitor (who looks -Z)
   addSignpost(9.5, 49, 0, [
-    '↑  museo · lago',
-    '←  observatorio · anfiteatro',
+    '↑  el lago · publica.la',
+    '←  observatorio · quién soy',
     'calesita de Almendra  →',
   ]);
-  // museum nameplate across the lake
-  addSignpost(7, -60, 0, ['museo argentino de ciencias naturales'], { size: 0.6 });
+  // publica.la nameplate across the lake
+  addSignpost(7, -60, 0, ['publica.la'], { size: 0.72 });
 }
 
 function addPier() {
@@ -1272,6 +1431,10 @@ function addPier() {
   g.position.set(13, 0, 19); // edge → out over the water
   g.rotation.y = 0.2;
   scene.add(g);
+  registerInteractable(13, 19, 5.5, {
+    kind: 'familia', name: 'para los Laurino', emoji: '♥',
+    text: 'el muelle es para toda la familia.', url: null, accent: FAMILY_ACCENT,
+  });
 }
 
 let kite = null;
@@ -1296,6 +1459,296 @@ function addKite(x, z) {
 }
 
 /* ----------------------------------------------------------------------------
+ * Walkable portrait — proximity placards (projects, institution, places, family)
+ * ------------------------------------------------------------------------- */
+const interactables = [];
+function registerInteractable(x, z, r, data) {
+  interactables.push({ x, z, r, leaveR: r + 2.6, data });
+}
+
+const cardEl = document.getElementById('card');
+let activeIt = null;
+
+function showCard(d) {
+  const accent = d.accent || '#cdb9f2';
+  cardEl.style.setProperty('--accent', accent);
+  document.getElementById('cardEmoji').textContent = d.emoji || '•';
+  document.getElementById('cardKicker').textContent = d.kind || '';
+  document.getElementById('cardName').textContent = d.name || '';
+  document.getElementById('cardText').textContent = d.text || '';
+  const link = document.getElementById('cardLink');
+  if (d.url) {
+    link.href = d.url;
+    link.innerHTML = `${d.linkLabel || 'abrir'} <span aria-hidden="true">→</span>`;
+    // dark ink on light accents, paper on dark — keep the pill legible either way
+    const h = parseInt(accent.replace('#', ''), 16);
+    const lum = (0.299 * ((h >> 16) & 255) + 0.587 * ((h >> 8) & 255) + 0.114 * (h & 255)) / 255;
+    link.style.color = lum > 0.62 ? '#1c2118' : '#f4f1e8';
+    link.classList.remove('hidden');
+  } else {
+    link.classList.add('hidden');
+  }
+  cardEl.classList.remove('hidden');
+  const chip = document.getElementById('placeChip');
+  if (chip) chip.textContent = `📍 ${d.name || 'parque centenario'}`;
+}
+function hideCard() {
+  cardEl.classList.add('hidden');
+  const chip = document.getElementById('placeChip');
+  if (chip) chip.textContent = '📍 parque centenario';
+}
+
+function updateProximity() {
+  if (!controls.active) return;
+  const px = camera.position.x;
+  const pz = camera.position.z;
+  let best = null;
+  let bestD = Infinity;
+  for (const it of interactables) {
+    const d = Math.hypot(px - it.x, pz - it.z);
+    const limit = activeIt === it ? it.leaveR : it.r; // hysteresis
+    if (d < limit && d < bestD) {
+      best = it;
+      bestD = d;
+    }
+  }
+  if (best) {
+    if (activeIt !== best) {
+      activeIt = best;
+      showCard(best.data);
+    }
+  } else if (activeIt) {
+    activeIt = null;
+    hideCard();
+  }
+}
+
+/* ----------------------------------------------------------------------------
+ * Drifting jacaranda petals — cheap Points, respawn at the top
+ * ------------------------------------------------------------------------- */
+let petals = null;
+function addPetals() {
+  const n = isCoarse ? 90 : 170;
+  const pos = new Float32Array(n * 3);
+  const data = [];
+  const R = 64;
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = Math.sqrt(Math.random()) * R;
+    pos[i * 3] = Math.cos(a) * r;
+    pos[i * 3 + 1] = Math.random() * 20;
+    pos[i * 3 + 2] = Math.sin(a) * r;
+    data.push({ vy: 0.5 + Math.random() * 0.7, sw: 0.4 + Math.random() * 0.8, ph: Math.random() * 6.28 });
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 64;
+  const cx = cv.getContext('2d');
+  const grd = cx.createRadialGradient(32, 30, 1, 32, 32, 30);
+  grd.addColorStop(0, 'rgba(204,180,234,0.95)');
+  grd.addColorStop(1, 'rgba(141,123,216,0)');
+  cx.fillStyle = grd;
+  cx.beginPath();
+  cx.ellipse(32, 32, 30, 22, 0, 0, Math.PI * 2);
+  cx.fill();
+  const sprite = new THREE.CanvasTexture(cv);
+  const mat = new THREE.PointsMaterial({
+    size: 0.95, map: sprite, transparent: true, depthWrite: false, opacity: 0.8, color: 0xcab8e8,
+  });
+  const pts = new THREE.Points(geo, mat);
+  pts.frustumCulled = false;
+  scene.add(pts);
+  petals = { pts, pos, data, n };
+}
+function updatePetals(dt, t) {
+  if (!petals) return;
+  const { pos, data, n } = petals;
+  for (let i = 0; i < n; i++) {
+    pos[i * 3 + 1] -= data[i].vy * dt;
+    pos[i * 3] += Math.sin(t * data[i].sw + data[i].ph) * dt * 0.5;
+    if (pos[i * 3 + 1] < 0.15) {
+      // respawn at the top, re-randomized within the disc so the slow x-drift
+      // doesn't let petals migrate out of the park over a long session
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.sqrt(Math.random()) * 64;
+      pos[i * 3] = Math.cos(a) * r;
+      pos[i * 3 + 1] = 18 + Math.random() * 3;
+      pos[i * 3 + 2] = Math.sin(a) * r;
+    }
+  }
+  petals.pts.geometry.attributes.position.needsUpdate = true;
+}
+
+/* ----------------------------------------------------------------------------
+ * The cities of my life — low-poly monuments (Buenos Aires, Roma, Scicli, Cascais)
+ * ------------------------------------------------------------------------- */
+function monObelisco() {
+  const g = new THREE.Group();
+  const white = new THREE.MeshStandardMaterial({ color: 0xeceee9, roughness: 0.85, flatShading: true });
+  const base = new THREE.Mesh(new THREE.BoxGeometry(3, 1.4, 3), white);
+  base.position.y = 0.7;
+  g.add(base);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 1.1, 13, 4), white);
+  shaft.rotation.y = Math.PI / 4;
+  shaft.position.y = 7.4;
+  g.add(shaft);
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.85, 1.6, 4), white);
+  tip.rotation.y = Math.PI / 4;
+  tip.position.y = 14.7;
+  g.add(tip);
+  return g;
+}
+function monColumn() {
+  const g = new THREE.Group();
+  const stone = new THREE.MeshStandardMaterial({ color: 0xd9cdb0, roughness: 0.9, flatShading: true });
+  const dark = new THREE.MeshStandardMaterial({ color: 0xb8a988, roughness: 0.9, flatShading: true });
+  const plinth = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1, 2.6), stone);
+  plinth.position.y = 0.5;
+  g.add(plinth);
+  const drum = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.15, 0.6, 16), stone);
+  drum.position.y = 1.3;
+  g.add(drum);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.95, 9, 18), stone);
+  shaft.position.y = 6.1;
+  g.add(shaft);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 0.85, 0.8, 16), stone);
+  cap.position.y = 11;
+  g.add(cap);
+  const abacus = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.5, 2.2), stone);
+  abacus.position.y = 11.6;
+  g.add(abacus);
+  const frag = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.7, 1.2), dark);
+  frag.position.set(0.2, 12.2, 0);
+  frag.rotation.z = 0.12;
+  g.add(frag);
+  return g;
+}
+function monCampanile() {
+  const g = new THREE.Group();
+  const honey = new THREE.MeshStandardMaterial({ color: 0xe6d29a, roughness: 0.92, flatShading: true });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x3a3026 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(3.4, 9, 3.4), honey);
+  body.position.y = 4.5;
+  g.add(body);
+  const belfry = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3, 2.8), honey);
+  belfry.position.y = 10.5;
+  g.add(belfry);
+  [[0, 1.45], [0, -1.45], [1.45, 0], [-1.45, 0]].forEach(([ox, oz]) => {
+    const arch = new THREE.Mesh(new THREE.BoxGeometry(oz ? 1.2 : 0.2, 1.8, oz ? 0.2 : 1.2), dark);
+    arch.position.set(ox, 10.6, oz);
+    g.add(arch);
+  });
+  const cornice = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 3.2), honey);
+  cornice.position.y = 12.2;
+  g.add(cornice);
+  const dome = new THREE.Mesh(
+    new THREE.SphereGeometry(1.2, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.MeshStandardMaterial({ color: 0xbfae7e, roughness: 0.6, metalness: 0.2, flatShading: true })
+  );
+  dome.position.y = 12.4;
+  g.add(dome);
+  const finial = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.9, 6), dark);
+  finial.position.y = 13.7;
+  g.add(finial);
+  return g;
+}
+function monLighthouse() {
+  const g = new THREE.Group();
+  const cv = document.createElement('canvas');
+  cv.width = 64;
+  cv.height = 256;
+  const cx = cv.getContext('2d');
+  for (let i = 0; i < 8; i++) {
+    cx.fillStyle = i % 2 ? '#d23b34' : '#f3efe6';
+    cx.fillRect(0, (i / 8) * 256, 64, 256 / 8);
+  }
+  const stripe = new THREE.CanvasTexture(cv);
+  stripe.colorSpace = THREE.SRGBColorSpace;
+  const tower = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.5, 10, 18), new THREE.MeshStandardMaterial({ map: stripe, roughness: 0.85 }));
+  tower.position.y = 5;
+  g.add(tower);
+  const gallery = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.6, 18), new THREE.MeshStandardMaterial({ color: 0x2a2f33, roughness: 0.6 }));
+  gallery.position.y = 10.3;
+  g.add(gallery);
+  const lantern = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 1.8, 12), new THREE.MeshStandardMaterial({ color: 0x14181c, roughness: 0.3, metalness: 0.3 }));
+  lantern.position.y = 11.5;
+  g.add(lantern);
+  const light = new THREE.Mesh(new THREE.SphereGeometry(0.55, 12, 8), new THREE.MeshStandardMaterial({ color: 0xfff3cf, emissive: 0xffe08a, emissiveIntensity: 1.6 }));
+  light.position.y = 11.5;
+  g.add(light);
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(1.2, 1.4, 14), new THREE.MeshStandardMaterial({ color: 0x2a2f33, roughness: 0.6, flatShading: true }));
+  cap.position.y = 13.1;
+  g.add(cap);
+  return g;
+}
+
+function addPlaces() {
+  const builders = { 'buenos aires': monObelisco, roma: monColumn, scicli: monCampanile, cascais: monLighthouse };
+  PLACES.forEach((pl) => {
+    const g = (builders[pl.name] || monColumn)();
+    // a little marker post + plaque in front, facing the walker
+    const post = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.09, 0.09, 1.1, 6),
+      new THREE.MeshStandardMaterial({ color: 0x6b5a44, roughness: 0.9 })
+    );
+    post.position.set(0, 0.55, 2.35);
+    g.add(post);
+    const plaque = makePlaque(`${pl.name} · ${pl.km}`, 0.4, {
+      bg: '#2b2620', fg: '#f1e9d8', family: 'ui-monospace, Menlo, monospace', weight: '600',
+      border: hexToRgba(pl.accent, 0.85), metalness: 0.2,
+    });
+    plaque.position.set(0, 1.25, 2.4);
+    g.add(plaque);
+    g.position.set(pl.x, 0, pl.z);
+    g.rotation.y = Math.atan2(-pl.x, -pl.z); // face the park centre / the walker
+    g.traverse((m) => (m.castShadow = true));
+    scene.add(g);
+    registerInteractable(pl.x, pl.z, 6.2, {
+      kind: pl.kind, name: pl.name, text: pl.text, emoji: pl.emoji, url: null, accent: pl.accent,
+    });
+  });
+}
+
+/* ----------------------------------------------------------------------------
+ * rd3 — the first marketing agency, where it all started (a small atelier)
+ * ------------------------------------------------------------------------- */
+function addRd3() {
+  const g = new THREE.Group();
+  const wall = new THREE.MeshStandardMaterial({ color: 0xe7d9c4, roughness: 0.95 });
+  const trim = new THREE.MeshStandardMaterial({ color: new THREE.Color(RD3.accent), roughness: 0.7 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(6, 4.2, 5), wall);
+  body.position.y = 2.1;
+  g.add(body);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(6.4, 0.4, 5.4), trim);
+  roof.position.y = 4.3;
+  g.add(roof);
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 0.1), new THREE.MeshStandardMaterial({ color: 0x4a3a2a }));
+  door.position.set(-1.3, 1.2, 2.51);
+  g.add(door);
+  const win = new THREE.Mesh(new THREE.BoxGeometry(2, 1.4, 0.1), new THREE.MeshStandardMaterial({ color: 0x7fa8b8, roughness: 0.3, metalness: 0.2 }));
+  win.position.set(1.2, 2.1, 2.51);
+  g.add(win);
+  const awning = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.12, 1.1), trim);
+  awning.position.set(0, 3.0, 3.0);
+  awning.rotation.x = 0.18;
+  g.add(awning);
+  const sign = makePlaque('rd3', 0.8, {
+    bg: '#23201a', fg: '#f4f1e8', family: 'ui-monospace, Menlo, monospace', weight: '700',
+    border: hexToRgba(RD3.accent, 0.95), metalness: 0.2,
+  });
+  sign.position.set(0, 3.72, 2.55);
+  g.add(sign);
+  g.position.set(RD3.x, 0, RD3.z);
+  g.rotation.y = Math.atan2(-RD3.x, -RD3.z);
+  g.traverse((m) => (m.castShadow = true));
+  scene.add(g);
+  registerInteractable(RD3.x, RD3.z, 6.5, {
+    kind: RD3.kind, name: RD3.name, text: RD3.text, emoji: RD3.emoji, url: RD3.url, accent: RD3.accent,
+  });
+}
+
+/* ----------------------------------------------------------------------------
  * Build the world
  * ------------------------------------------------------------------------- */
 function buildWorld() {
@@ -1311,6 +1764,8 @@ function buildWorld() {
   addCalesita();
   addAurora();
   addCurieBust();
+  addRd3();
+  addPlaces();
   addTrees();
   addLamps();
   addBenches();
@@ -1320,6 +1775,7 @@ function buildWorld() {
   addSignposts();
   addDedications();
   addPeople();
+  addPetals();
 }
 
 /* ----------------------------------------------------------------------------
@@ -1551,10 +2007,12 @@ function setAudio(on) {
  * Loop
  * ------------------------------------------------------------------------- */
 const timer = new THREE.Timer();
+timer.connect(document); // zero the delta while the tab is hidden (no jump on return)
 function tick() {
   timer.update();
   const dt = Math.min(timer.getDelta(), 0.05);
-  updateControls(dt);
+  if (cine.playing) updateIntro();
+  else updateControls(dt);
   const t = timer.getElapsed();
   waterUniforms.uTime.value = t;
   if (calesitaSpinner) calesitaSpinner.rotation.y += dt * 0.25;
@@ -1578,6 +2036,8 @@ function tick() {
     b.g.position.y = 0.45 + Math.sin(b.phase * 2) * 0.04;
     b.g.rotation.y = -b.phase;
   }
+  updatePetals(dt, t);
+  updateProximity();
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
@@ -1595,19 +2055,110 @@ addEventListener('resize', onResize);
 addEventListener('orientationchange', () => setTimeout(onResize, 250));
 
 /* ----------------------------------------------------------------------------
+ * Cinematic entrance — an aerial orbit of the park, then a dive into first person
+ * ------------------------------------------------------------------------- */
+const SPAWN = { pos: new THREE.Vector3(0, EYE, 54), yaw: 0, pitch: -0.06 };
+const cine = {
+  playing: false,
+  t: 0,
+  dur: 4.8,
+  center: new THREE.Vector3(0, 5, 0),
+  R: 74,
+  hi: 98,
+  ho: 70,
+  a0: 2.75,
+  a1: Math.PI / 2,
+  orbit: 0.6, // fraction of the run spent orbiting before the dive
+  _up: new THREE.Vector3(0, 1, 0),
+  _m: new THREE.Matrix4(),
+};
+const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+function lookQuat(pos, target) {
+  cine._m.lookAt(pos, target, cine._up);
+  return new THREE.Quaternion().setFromRotationMatrix(cine._m);
+}
+
+function introPose(p) {
+  if (p < cine.orbit) {
+    const u = easeInOut(p / cine.orbit);
+    const ang = cine.a0 + (cine.a1 - cine.a0) * u;
+    const h = cine.hi + (cine.ho - cine.hi) * u;
+    const pos = new THREE.Vector3(Math.cos(ang) * cine.R, h, Math.sin(ang) * cine.R);
+    return { pos, quat: lookQuat(pos, cine.center) };
+  }
+  const u = easeInOut((p - cine.orbit) / (1 - cine.orbit));
+  const aerialPos = new THREE.Vector3(Math.cos(cine.a1) * cine.R, cine.ho, Math.sin(cine.a1) * cine.R);
+  const aerialQuat = lookQuat(aerialPos, cine.center);
+  const spawnQuat = new THREE.Quaternion().setFromEuler(new THREE.Euler(SPAWN.pitch, SPAWN.yaw, 0, 'YXZ'));
+  return {
+    pos: aerialPos.clone().lerp(SPAWN.pos, u),
+    quat: aerialQuat.clone().slerp(spawnQuat, u),
+  };
+}
+
+function updateIntro() {
+  // wall-clock driven so the run is a constant 4.8s at any frame rate
+  const p = Math.min((performance.now() - cine.start) / 1000 / cine.dur, 1);
+  const { pos, quat } = introPose(p);
+  camera.position.copy(pos);
+  camera.quaternion.copy(quat);
+  if (p >= 1) finishIntro();
+}
+
+function startIntro() {
+  cine.playing = true;
+  cine.start = performance.now();
+  controls.active = false;
+  document.getElementById('cinematic').classList.remove('hidden');
+}
+
+function finishIntro() {
+  if (!cine.playing) return;
+  cine.playing = false;
+  // hand the camera to the player exactly where the dive ended
+  camera.position.copy(SPAWN.pos);
+  controls.yaw = SPAWN.yaw;
+  controls.pitch = SPAWN.pitch;
+  controls.active = true;
+  document.getElementById('cinematic').classList.add('hidden');
+  document.getElementById('hud').classList.remove('hidden');
+  // auto-hide the verbose control hint after ~9s (malamud behaviour)
+  setTimeout(() => document.querySelector('.hint')?.classList.add('fade'), 9000);
+}
+
+// if the tab is hidden mid-intro, pause the wall-clock so the aerial reveal
+// isn't silently used up — the visitor still gets the full drop on return.
+let cineHiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (!cine.playing) return;
+  if (document.hidden) cineHiddenAt = performance.now();
+  else if (cineHiddenAt) {
+    cine.start += performance.now() - cineHiddenAt;
+    cineHiddenAt = 0;
+  }
+});
+
+/* ----------------------------------------------------------------------------
  * Intro gate + boot
  * ------------------------------------------------------------------------- */
 function enterScene() {
-  if (controls.active) return;
-  controls.active = true;
+  if (controls.active || cine.playing) return;
   const intro = document.getElementById('intro');
-  const hud = document.getElementById('hud');
   intro.classList.add('go');
   setTimeout(() => intro.remove(), 1100);
-  hud.classList.remove('hidden');
   setAudio(true);
-  // auto-hide the verbose control hint after ~9s (malamud behaviour)
-  setTimeout(() => document.querySelector('.hint')?.classList.add('fade'), 9000);
+  // motion-sensitive visitors skip the swooping aerial dive entirely
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    camera.position.copy(SPAWN.pos);
+    controls.yaw = SPAWN.yaw;
+    controls.pitch = SPAWN.pitch;
+    controls.active = true;
+    document.getElementById('hud').classList.remove('hidden');
+    setTimeout(() => document.querySelector('.hint')?.classList.add('fade'), 9000);
+    return;
+  }
+  startIntro();
 }
 
 function boot() {
@@ -1624,14 +2175,14 @@ function boot() {
   loadline.textContent = 'el parque está listo.';
   enterBtn.disabled = false;
   enterBtn.addEventListener('click', enterScene);
-  addEventListener(
-    'keydown',
-    (e) => {
-      if ((e.code === 'Enter' || e.code === 'Space') && !controls.active) enterScene();
-    },
-    { once: false }
-  );
+  addEventListener('keydown', (e) => {
+    if ((e.code === 'Enter' || e.code === 'Space') && !controls.active && !cine.playing) enterScene();
+    if (e.code === 'Escape' && cine.playing) finishIntro();
+  });
 
+  document.getElementById('skip').addEventListener('click', finishIntro);
+  // tap anywhere on the cinematic overlay to skip (the only escape hatch on touch)
+  document.getElementById('cinematic').addEventListener('pointerdown', finishIntro);
   document.getElementById('sound').addEventListener('click', () => setAudio(!audio.on));
 }
 

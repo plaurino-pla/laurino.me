@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>parque centenario · laurino.me</title>
-    <meta name="description" content="una caminata por el parque centenario, caballito, buenos aires." />
+    <title>pablo laurino · laurino.me</title>
+    <meta name="description" content="el parque de pablo laurino — una caminata en 3d por lo que construyo, en caballito, buenos aires." />
     <meta name="theme-color" content="#9fb98a" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <!-- open graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="parque centenario · laurino.me" />
-    <meta property="og:description" content="una caminata por el parque centenario, caballito, buenos aires." />
+    <meta property="og:title" content="pablo laurino · laurino.me" />
+    <meta property="og:description" content="una caminata en 3d por lo que construyo. caballito, buenos aires." />
     <meta property="og:url" content="https://laurino.me" />
     <meta property="og:image" content="https://laurino.me/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -19,8 +19,8 @@
 
     <!-- twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="parque centenario · laurino.me" />
-    <meta name="twitter:description" content="una caminata por el parque centenario, caballito, buenos aires." />
+    <meta name="twitter:title" content="pablo laurino · laurino.me" />
+    <meta name="twitter:description" content="una caminata en 3d por lo que construyo. caballito, buenos aires." />
     <meta name="twitter:image" content="https://laurino.me/og.png" />
   </head>
   <body>
@@ -30,33 +30,52 @@
     <div id="intro" class="overlay">
       <div class="intro-inner">
         <p class="sitename">laurino.me</p>
-        <h1 class="title">parque centenario</h1>
-        <p class="place">📍 caballito · buenos aires</p>
+        <h1 class="title">pablo laurino</h1>
+        <p class="place">no es un sitio web — es un lugar para caminar.</p>
 
-        <button id="enter" class="enter">entrar a caminar</button>
+        <button id="enter" class="enter">entrar</button>
 
         <ul class="legend">
-          <li><b>wasd</b> / <b>flechas</b> — caminar</li>
-          <li><b>arrastrá</b> o <b>deslizá</b> — mirar</li>
-          <li><b>mantené pulsado</b> — avanzar</li>
+          <li class="legend-controls">wasd / flechas para caminar · arrastrá para mirar · (celular: mantené pulsado)</li>
+          <li>acercate a todo — <b>proyectos, ciudades, familia</b></li>
         </ul>
 
         <p class="loadline" id="loadline">cargando el parque…</p>
       </div>
     </div>
 
+    <!-- cinematic title, shown during the aerial drop -->
+    <div id="cinematic" class="cinematic hidden">
+      <div class="cine-title">
+        <span class="cine-name">LAURINO</span>
+        <span class="cine-sub">una versión caminable de mi vida</span>
+      </div>
+      <button id="skip" class="skip">saltar intro →</button>
+    </div>
+
+    <!-- proximity placard (project / family / place) -->
+    <div id="card" class="card hidden" aria-live="polite">
+      <div class="card-emoji" id="cardEmoji">🌳</div>
+      <div class="card-body">
+        <p class="card-kicker" id="cardKicker">proyecto</p>
+        <h2 class="card-name" id="cardName"></h2>
+        <p class="card-text" id="cardText"></p>
+        <a class="card-link hidden" id="cardLink" target="_blank" rel="noopener">abrir →</a>
+      </div>
+    </div>
+
     <!-- heads-up display, shown while walking -->
     <div id="hud" class="hud hidden">
-      <div class="chip place-chip">📍 parque centenario</div>
+      <div class="chip place-chip" id="placeChip">📍 parque centenario</div>
       <button id="sound" class="chip sound" aria-pressed="false" title="sonido">♪ sonido</button>
       <div class="hint"><span class="kb">wasd / flechas: caminar · </span>arrastrá o deslizá: mirar<span class="touch"> · mantené pulsado: avanzar</span></div>
-      <a class="sig" href="https://laurino.me">laurino.me</a>
+      <a class="sig" href="https://laurino.me">pablo laurino</a>
     </div>
 
     <!-- webgl unsupported -->
     <div id="fallback" class="overlay hidden">
       <div class="intro-inner">
-        <h1 class="title">parque centenario</h1>
+        <h1 class="title">pablo laurino</h1>
         <p class="place">no se pudo iniciar webgl en este navegador.</p>
         <p class="loadline">probá con chrome, firefox o safari actualizados.</p>
       </div>
