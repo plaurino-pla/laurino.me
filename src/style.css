@@ -1,9 +1,9 @@
 :root {
-  --ink: #1c2118;
-  --paper: #f4f1e8;
-  --muted: rgba(244, 241, 232, 0.62);
-  --line: rgba(244, 241, 232, 0.22);
-  --jac: #8d7bd8; /* jacarandá */
+  --ink: #140d07;
+  --paper: #ece0c8;
+  --muted: rgba(236, 224, 200, 0.62);
+  --line: rgba(236, 224, 200, 0.2);
+  --jac: #c79a4e; /* brass / lamp-light accent */
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
 }
@@ -19,7 +19,7 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: #0e1410;
+  background: #120c06;
   color: var(--paper);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -46,8 +46,8 @@ body {
   padding: 24px;
   text-align: center;
   background:
-    radial-gradient(120% 120% at 50% 18%, rgba(141, 123, 216, 0.18), transparent 55%),
-    linear-gradient(180deg, #1a2417 0%, #0e1410 100%);
+    radial-gradient(120% 120% at 50% 20%, rgba(199, 154, 78, 0.2), transparent 55%),
+    linear-gradient(180deg, #241a0e 0%, #120c06 100%);
   transition: opacity 1s ease, filter 1s ease, transform 1s ease;
 }
 
@@ -100,7 +100,7 @@ body {
   font-size: 0.9rem;
   letter-spacing: 0.04em;
   color: var(--paper);
-  background: rgba(141, 123, 216, 0.16);
+  background: rgba(199, 154, 78, 0.16);
   border: 1px solid var(--jac);
   border-radius: 999px;
   padding: 0.7rem 1.5rem;
@@ -109,7 +109,7 @@ body {
 }
 
 .enter:hover {
-  background: rgba(141, 123, 216, 0.32);
+  background: rgba(199, 154, 78, 0.34);
   transform: translateY(-1px);
 }
 

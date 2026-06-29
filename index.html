@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>pablo laurino · laurino.me</title>
-    <meta name="description" content="el parque de pablo laurino — una caminata en 3d por lo que construyo, en caballito, buenos aires." />
-    <meta name="theme-color" content="#9fb98a" />
+    <title>pablo laurino · una biblioteca infinita</title>
+    <meta name="description" content="una biblioteca infinita — la versión caminable de la vida de pablo laurino. cada libro, una parte de mi vida." />
+    <meta name="theme-color" content="#17100a" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <!-- open graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="pablo laurino · laurino.me" />
-    <meta property="og:description" content="una caminata en 3d por lo que construyo. caballito, buenos aires." />
+    <meta property="og:title" content="pablo laurino · una biblioteca infinita" />
+    <meta property="og:description" content="una biblioteca infinita, caminable. cada libro, una parte de mi vida." />
     <meta property="og:url" content="https://laurino.me" />
     <meta property="og:image" content="https://laurino.me/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -19,8 +19,8 @@
 
     <!-- twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="pablo laurino · laurino.me" />
-    <meta name="twitter:description" content="una caminata en 3d por lo que construyo. caballito, buenos aires." />
+    <meta name="twitter:title" content="pablo laurino · una biblioteca infinita" />
+    <meta name="twitter:description" content="una biblioteca infinita, caminable. cada libro, una parte de mi vida." />
     <meta name="twitter:image" content="https://laurino.me/og.png" />
   </head>
   <body>
@@ -31,31 +31,31 @@
       <div class="intro-inner">
         <p class="sitename">laurino.me</p>
         <h1 class="title">pablo laurino</h1>
-        <p class="place">no es un sitio web — es un lugar para caminar.</p>
+        <p class="place">no es un sitio web — es una biblioteca infinita.</p>
 
         <button id="enter" class="enter">entrar</button>
 
         <ul class="legend">
           <li class="legend-controls">wasd / flechas para caminar · arrastrá para mirar · (celular: mantené pulsado)</li>
-          <li>acercate a todo — <b>proyectos, ciudades, familia</b></li>
+          <li>acercate a los libros — <b>proyectos, ciudades, los míos</b></li>
         </ul>
 
-        <p class="loadline" id="loadline">cargando el parque…</p>
+        <p class="loadline" id="loadline">ordenando los estantes…</p>
       </div>
     </div>
 
-    <!-- cinematic title, shown during the aerial drop -->
+    <!-- cinematic title, shown during the descent -->
     <div id="cinematic" class="cinematic hidden">
       <div class="cine-title">
         <span class="cine-name">LAURINO</span>
-        <span class="cine-sub">una versión caminable de mi vida</span>
+        <span class="cine-sub">cada libro, una parte de mi vida</span>
       </div>
       <button id="skip" class="skip">saltar intro →</button>
     </div>
 
-    <!-- proximity placard (project / family / place) -->
+    <!-- proximity placard (a book = a project / city / family) -->
     <div id="card" class="card hidden" aria-live="polite">
-      <div class="card-emoji" id="cardEmoji">🌳</div>
+      <div class="card-emoji" id="cardEmoji">📖</div>
       <div class="card-body">
         <p class="card-kicker" id="cardKicker">proyecto</p>
         <h2 class="card-name" id="cardName"></h2>
@@ -66,7 +66,7 @@
 
     <!-- heads-up display, shown while walking -->
     <div id="hud" class="hud hidden">
-      <div class="chip place-chip" id="placeChip">📍 parque centenario</div>
+      <div class="chip place-chip" id="placeChip">📖 la biblioteca</div>
       <button id="sound" class="chip sound" aria-pressed="false" title="sonido">♪ sonido</button>
       <div class="hint"><span class="kb">wasd / flechas: caminar · </span>arrastrá o deslizá: mirar<span class="touch"> · mantené pulsado: avanzar</span></div>
       <a class="sig" href="https://laurino.me">pablo laurino</a>
